@@ -57,3 +57,32 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+MeterEye AI is an intelligent energy monitoring and management platform designed to modernize electricity consumption tracking for both prepaid (Cash Power) and postpaid meters.
+
+The platform combines web, mobile, IoT, OCR, and AI technologies to provide real-time meter monitoring, automated readings, anomaly detection, consumption analytics, and predictive insights. It supports multiple reading methods including manual input, ESP32-CAM image capture with OCR, and smart sensor integration using ESP32 and PZEM modules.
+
+Key features include:
+
+Smart meter monitoring
+Real-time consumption tracking
+AI-based anomaly detection
+Credit depletion prediction for prepaid meters
+Automated alerts and notifications
+IoT device integration
+OCR-based meter reading extraction
+Web and mobile dashboard
+Energy usage reports and analytics
+
+Built with modern technologies such as:
+
+Spring Boot
+Flutter
+Angular/Web Frontend
+PostgreSQL
+ESP32 / IoT
+FastAPI OCR Services
+AI-powered analytics
+
+MeterEye AI aims to make energy management smarter, more accessible, and more proactive for households, businesses, and utility monitoring systems.
