@@ -63,14 +63,15 @@ export class CreateCompteurComponent implements OnInit {
 
     this.compteurService.createCompteur(payload).subscribe({
       next: (compteur) => {
-        this.compteurService.sauvegarderCompteurId(compteur.id);
-        this.compteurService.sauvegarderTypeCompteur(compteur.typeCompteur);
+        this.isLoading = false;
+        this.compteurService.sauvegarderCompteurId(compteur?.id ?? 0);
+        this.compteurService.sauvegarderTypeCompteur(compteur?.typeCompteur ?? this.typeSelectionne);
         this.toast.success('Compteur enregistré avec succès !');
         this.router.navigate(['/onboarding/mode-lecture']);
       },
       error: (err: Error) => {
-        this.errorMessage = err.message;
         this.isLoading    = false;
+        this.errorMessage = err.message ?? 'Erreur serveur, réessayez.';
       }
     });
   }
