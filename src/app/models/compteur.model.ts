@@ -1,9 +1,10 @@
 // ✅ CRÉÉ — compteur.model.ts
 
 export interface CompteurRequest {
-  reference:    string;
-  adresse:      string;
-  typeCompteur: 'CLASSIQUE' | 'CASH_POWER';
+  reference:     string;
+  adresse:       string;
+  typeCompteur:  'CLASSIQUE' | 'CASH_POWER';
+  valeurInitiale: number;
 }
 
 export interface CompteurResponse {
