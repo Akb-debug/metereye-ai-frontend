@@ -1,0 +1,166 @@
+<!-- ✅ CRÉÉ — profil.component.html -->
+<app-toast></app-toast>
+
+<div class="app-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    <app-header
+      pageTitle="Mon profil"
+      pageSubtitle="Gérez vos informations et préférences">
+    </app-header>
+
+    <div class="page-body">
+
+      @if (isLoading) {
+        <app-loading-spinner [size]="48" label="Chargement du profil..."></app-loading-spinner>
+      } @else if (!profil) {
+        <div class="empty-state">
+          <p>Impossible de charger le profil. Réessayez plus tard.</p>
+        </div>
+      } @else {
+
+        <div class="profil-grid">
+
+          <!-- Avatar + info rapide -->
+          <div class="card avatar-card">
+            <div class="big-avatar">{{ getInitiales() }}</div>
+            <h2 class="avatar-name">{{ profil.prenom }} {{ profil.nom }}</h2>
+            <p class="avatar-email">{{ profil.email }}</p>
+            <span class="badge badge-primary" style="margin-top:8px;text-transform:capitalize">
+              {{ profil.role | lowercase }}
+            </span>
+            <button class="btn btn-outline btn-sm btn-danger-outline" style="margin-top:20px;width:100%" (click)="deconnecter()">
+              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+              </svg>
+              Déconnexion
+            </button>
+          </div>
+
+          <div class="profil-right">
+
+            <!-- Informations personnelles -->
+            <div class="card">
+              <div class="card-header">
+                <h3>Informations personnelles</h3>
+              </div>
+
+              <form [formGroup]="infosForm" (ngSubmit)="sauvegarderInfos()">
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label>Prénom</label>
+                    <input type="text" class="form-control" formControlName="prenom"
+                      [class.is-invalid]="fi['prenom'].invalid && fi['prenom'].touched"/>
+                  </div>
+                  <div class="form-group">
+                    <label>Nom</label>
+                    <input type="text" class="form-control" formControlName="nom"
+                      [class.is-invalid]="fi['nom'].invalid && fi['nom'].touched"/>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>Adresse email</label>
+                  <input type="email" class="form-control" formControlName="email"
+                    [class.is-invalid]="fi['email'].invalid && fi['email'].touched"/>
+                </div>
+
+                <div class="form-group">
+                  <label>Téléphone</label>
+                  <input type="tel" class="form-control" formControlName="telephone"/>
+                </div>
+
+                <div style="display:flex;justify-content:flex-end">
+                  <button type="submit" class="btn btn-primary btn-sm" [disabled]="isSavingInfos">
+                    @if (isSavingInfos) { <span class="btn-spinner"></span> }
+                    Sauvegarder
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Seuils d'alerte -->
+            <div class="card" style="margin-top:16px">
+              <div class="card-header">
+                <h3>Seuils d'alerte</h3>
+              </div>
+
+              <form [formGroup]="seuilsForm" (ngSubmit)="sauvegarderSeuils()">
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label>Seuil crédit Cash Power (%)</label>
+                    <input type="number" class="form-control" formControlName="seuilCredit"
+                      min="0" max="100"/>
+                    <span class="help-text">Alerte quand le crédit passe sous ce seuil</span>
+                  </div>
+                  <div class="form-group">
+                    <label>Seuil anomalie consommation (kWh)</label>
+                    <input type="number" class="form-control" formControlName="seuilAnomalie" min="0"/>
+                    <span class="help-text">Alerte si consommation dépasse cette valeur</span>
+                  </div>
+                </div>
+
+                <div style="display:flex;justify-content:flex-end">
+                  <button type="submit" class="btn btn-primary btn-sm" [disabled]="isSavingSeuils">
+                    @if (isSavingSeuils) { <span class="btn-spinner"></span> }
+                    Sauvegarder
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Préférences de notification -->
+            <div class="card" style="margin-top:16px">
+              <div class="card-header">
+                <h3>Préférences de notification</h3>
+              </div>
+
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-title">Notifications push</div>
+                  <div class="toggle-desc">Recevoir des notifications dans l'application</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" [(ngModel)]="notifPush" [ngModelOptions]="{standalone:true}"/>
+                  <span class="toggle-thumb"></span>
+                </label>
+              </div>
+
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-title">Notifications SMS</div>
+                  <div class="toggle-desc">Recevoir des alertes par SMS sur {{ profil.telephone }}</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" [(ngModel)]="notifSms" [ngModelOptions]="{standalone:true}"/>
+                  <span class="toggle-thumb"></span>
+                </label>
+              </div>
+
+              <div class="toggle-row">
+                <div class="toggle-info">
+                  <div class="toggle-title">Notifications email</div>
+                  <div class="toggle-desc">Recevoir des rapports et alertes par email</div>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" [(ngModel)]="notifEmail" [ngModelOptions]="{standalone:true}"/>
+                  <span class="toggle-thumb"></span>
+                </label>
+              </div>
+
+              <div style="display:flex;justify-content:flex-end;margin-top:16px">
+                <button class="btn btn-primary btn-sm" (click)="sauvegarderNotifs()" [disabled]="isSavingNotifs">
+                  @if (isSavingNotifs) { <span class="btn-spinner"></span> }
+                  Sauvegarder
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      }
+    </div>
+  </div>
+</div>

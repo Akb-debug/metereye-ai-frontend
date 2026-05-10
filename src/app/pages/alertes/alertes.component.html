@@ -1,0 +1,103 @@
+<!-- ✅ CRÉÉ — alertes.component.html -->
+<app-toast></app-toast>
+
+<div class="app-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    <app-header
+      [pageTitle]="'Alertes' + (nbNonLues > 0 ? ' (' + nbNonLues + ' non lues)' : '')"
+      pageSubtitle="Notifications et événements de votre compteur">
+
+      @if (activeTab === 'alertes' && nbNonLues > 0) {
+        <button class="btn btn-outline" (click)="marquerToutLu()">
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          Tout marquer comme lu
+        </button>
+      }
+    </app-header>
+
+    <div class="page-body">
+
+      <!-- Tabs -->
+      <div class="tabs">
+        <button class="tab" [class.active]="activeTab === 'alertes'" (click)="activeTab = 'alertes'">
+          Alertes
+          @if (nbNonLues > 0) {
+            <span class="tab-badge">{{ nbNonLues }}</span>
+          }
+        </button>
+        <button class="tab" [class.active]="activeTab === 'notifications'" (click)="activeTab = 'notifications'">
+          Notifications
+        </button>
+      </div>
+
+      <!-- Onglet Alertes -->
+      @if (activeTab === 'alertes') {
+        @if (isLoadingAlertes) {
+          <app-loading-spinner [size]="40" label="Chargement des alertes..."></app-loading-spinner>
+        } @else if (alertes.length === 0) {
+          <div class="empty-state">
+            <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+            <p>Aucune alerte pour le moment. Tout va bien !</p>
+          </div>
+        } @else {
+          <div class="alerte-list">
+            @for (alerte of alertes; track alerte.id) {
+              <div class="alerte-item" [class.unread]="!alerte.lue" (click)="marquerLue(alerte)">
+                <div class="alerte-dot" [class]="'dot-' + alerteIcon(alerte.typeAlerte)"></div>
+                <div class="alerte-body">
+                  <div class="alerte-top">
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                      <span class="badge" [class]="'badge-' + alerteIcon(alerte.typeAlerte)" style="font-size:11px">
+                        {{ alerteLabel(alerte.typeAlerte) }}
+                      </span>
+                      <span class="alerte-ref">{{ alerte.compteurReference }}</span>
+                    </div>
+                    <div class="alerte-date">{{ alerte.dateCreation | date:'dd/MM/yyyy HH:mm' }}</div>
+                  </div>
+                  <p class="alerte-message">{{ alerte.message }}</p>
+                  @if (!alerte.lue) {
+                    <span class="unread-chip">Non lue · cliquer pour marquer comme lue</span>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+
+      <!-- Onglet Notifications -->
+      @if (activeTab === 'notifications') {
+        @if (isLoadingNotifs) {
+          <app-loading-spinner [size]="40" label="Chargement..."></app-loading-spinner>
+        } @else if (notifications.length === 0) {
+          <div class="empty-state">
+            <svg width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+            <p>Aucune notification.</p>
+          </div>
+        } @else {
+          <div class="alerte-list">
+            @for (n of notifications; track n.id) {
+              <div class="alerte-item" [class.unread]="!n.lue">
+                <div class="alerte-dot dot-info"></div>
+                <div class="alerte-body">
+                  <div class="alerte-top">
+                    <span style="font-weight:600;color:var(--color-dark)">{{ n.titre }}</span>
+                    <div class="alerte-date">{{ n.dateCreation | date:'dd/MM/yyyy HH:mm' }}</div>
+                  </div>
+                  <p class="alerte-message">{{ n.contenu }}</p>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+
+    </div>
+  </div>
+</div>

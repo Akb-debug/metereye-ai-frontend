@@ -1,0 +1,139 @@
+<!-- ✅ CRÉÉ — home.component.html (Landing page) -->
+
+<!-- NAVBAR -->
+<nav class="lp-nav">
+  <div class="lp-nav-brand">
+    <div class="lp-logo-icon">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+      </svg>
+    </div>
+    <span>MeterEye AI</span>
+  </div>
+  <div class="lp-nav-links">
+    <a routerLink="/auth/login"    class="btn btn-outline">Se connecter</a>
+    <a routerLink="/auth/register" class="btn btn-primary">Créer un compte</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="lp-hero">
+  <div class="lp-hero-content">
+    <span class="lp-badge">🇹🇬 Adapté au contexte togolais</span>
+    <h1>Gérez vos compteurs électriques <span class="lp-highlight">intelligemment</span></h1>
+    <p>MeterEye AI automatise la lecture de vos compteurs Cash Power et Classiques grâce à l'IoT. Suivez votre consommation, recevez des alertes, zéro coupure surprise.</p>
+    <div class="lp-hero-btns">
+      <a routerLink="/auth/register" class="btn btn-primary btn-lg">Commencer gratuitement</a>
+      <a routerLink="/auth/login"    class="btn btn-outline btn-lg">Se connecter</a>
+    </div>
+  </div>
+  <div class="lp-hero-visual">
+    <div class="lp-mockup">
+      <div class="lp-mockup-header">
+        <div class="lp-dot" style="background:#FF5F56"></div>
+        <div class="lp-dot" style="background:#FFBD2E"></div>
+        <div class="lp-dot" style="background:#27C93F"></div>
+      </div>
+      <div class="lp-mockup-body">
+        <div class="lp-stat-row">
+          <div class="lp-mini-card primary">
+            <div style="font-size:11px;color:#6B7280;margin-bottom:4px">Crédit restant</div>
+            <div style="font-size:24px;font-weight:700;color:#1A73E8">47.8 kWh</div>
+            <div class="lp-progress"><div class="lp-bar" style="width:60%;background:#1A73E8"></div></div>
+          </div>
+          <div class="lp-mini-card success">
+            <div style="font-size:11px;color:#6B7280;margin-bottom:4px">Ce mois</div>
+            <div style="font-size:24px;font-weight:700;color:#34A853">142 kWh</div>
+            <div style="font-size:11px;color:#34A853;margin-top:4px">↓ -8% vs mois dernier</div>
+          </div>
+        </div>
+        <div class="lp-mini-bars">
+          <div style="height:40%;background:#1A73E8;opacity:.7;border-radius:3px 3px 0 0"></div>
+          <div style="height:60%;background:#1A73E8;opacity:.8;border-radius:3px 3px 0 0"></div>
+          <div style="height:45%;background:#1A73E8;opacity:.7;border-radius:3px 3px 0 0"></div>
+          <div style="height:75%;background:#1A73E8;border-radius:3px 3px 0 0"></div>
+          <div style="height:55%;background:#1A73E8;opacity:.8;border-radius:3px 3px 0 0"></div>
+          <div style="height:80%;background:#1A73E8;border-radius:3px 3px 0 0"></div>
+          <div style="height:50%;background:#1A73E8;opacity:.7;border-radius:3px 3px 0 0"></div>
+        </div>
+        <div class="lp-alert-row">
+          <div class="lp-mini-alert">
+            <div style="width:8px;height:8px;border-radius:50%;background:#34A853;flex-shrink:0"></div>
+            Module connecté · Dernière lecture: il y a 2h
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="lp-features" id="features">
+  <div class="lp-container">
+    <h2>Tout ce dont vous avez besoin</h2>
+    <p class="lp-features-sub">Une solution complète pour la gestion de compteurs électriques au Togo</p>
+    <div class="lp-features-grid">
+      <div class="lp-feature-card">
+        <div class="lp-feature-icon" style="background:#E8F0FE">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#1A73E8" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <h3>Cash Power & Classique</h3>
+        <p>Gérez les deux types de compteurs en un seul endroit. Crédit en kWh ou index cumulatif.</p>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-icon" style="background:#E6F4EA">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#34A853" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+            <circle cx="12" cy="13" r="3"/>
+          </svg>
+        </div>
+        <h3>Lecture automatique</h3>
+        <p>ESP32-CAM ou capteur PZEM-004T. Fini la saisie manuelle — vos relevés sont automatiques.</p>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-icon" style="background:#FEF3C7">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#F59E0B" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+          </svg>
+        </div>
+        <h3>Alertes intelligentes</h3>
+        <p>Notification avant coupure, anomalie de consommation, module hors ligne. Push, SMS ou email.</p>
+      </div>
+      <div class="lp-feature-card">
+        <div class="lp-feature-icon" style="background:#FEE2E2">
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#EF4444" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+        </div>
+        <h3>Historique & Analyses</h3>
+        <p>Graphiques de consommation sur 7 jours, 30 jours. Exportez vos données facilement.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="lp-cta">
+  <div class="lp-container" style="text-align:center">
+    <h2>Prêt à gérer votre électricité intelligemment ?</h2>
+    <p>Inscription gratuite, configuration en 5 minutes.</p>
+    <a routerLink="/auth/register" class="btn btn-white btn-lg">Créer mon compte</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="lp-footer">
+  <div class="lp-container">
+    <div class="lp-footer-brand">
+      <div class="lp-logo-icon" style="width:32px;height:32px">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+        </svg>
+      </div>
+      <span style="font-weight:600;color:#fff">MeterEye AI</span>
+    </div>
+    <p>© 2026 MeterEye AI — ALLODE Kany Benjamin · Licence Génie Logiciel · IPNET Institute of Technology · Togo</p>
+  </div>
+</footer>

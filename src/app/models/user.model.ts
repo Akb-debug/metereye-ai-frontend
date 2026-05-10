@@ -1,21 +1,20 @@
-// Rôle : Définit les types TypeScript (interfaces) pour l'authentification.
-// Cela garantit que les données correspondent exactement à ce qu'attend le backend.
+// 🔄 MODIFIÉ — user.model.ts — ajouts : UserProfile, NotificationPreferences, UserState étendu
 
-// Ce que le backend renvoie après login ou register
 export interface AuthResponse {
-  token:      string;
-  role:       string;
-  nomComplet: string;
-  userId:     number;
+  token:     string;
+  type:      string;
+  id:        number;
+  email:     string;
+  role:      string;
+  nom:       string;
+  prenom:    string;
 }
 
-// Ce qu'on envoie au backend pour se connecter
 export interface LoginRequest {
   email:      string;
   motDePasse: string;
 }
 
-// Ce qu'on envoie au backend pour s'inscrire
 export interface RegisterRequest {
   nom:        string;
   prenom:     string;
@@ -25,7 +24,20 @@ export interface RegisterRequest {
   role:       string;
 }
 
-// État de connexion global dans l'application
+export interface UserProfile {
+  id:                    number;
+  nom:                   string;
+  prenom:                string;
+  email:                 string;
+  telephone:             string;
+  role:                  string;
+  seuilAlerteCredit:     number;
+  seuilAlerteAnomalie:   number;
+  notificationPush:      boolean;
+  notificationSms:       boolean;
+  notificationEmail:     boolean;
+}
+
 export interface UserState {
   isLoggedIn: boolean;
   user:       AuthResponse | null;

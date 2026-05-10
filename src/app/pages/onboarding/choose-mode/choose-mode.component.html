@@ -1,0 +1,77 @@
+<!-- ✅ CRÉÉ — choose-mode.component.html -->
+<app-toast></app-toast>
+
+<div class="auth-page" style="align-items:flex-start;padding-top:48px">
+  <div class="onboarding-card">
+
+    <!-- Stepper 2/2 -->
+    <div class="stepper">
+      <div class="step done">
+        <div class="step-circle">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <span class="step-label">Votre compteur</span>
+      </div>
+      <div class="step-line done"></div>
+      <div class="step active">
+        <div class="step-circle">2</div>
+        <span class="step-label">Mode de lecture</span>
+      </div>
+    </div>
+
+    <h2>Comment lirez-vous votre compteur ?</h2>
+    <p class="subtitle">Choisissez le mode adapté à votre installation</p>
+
+    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
+      @for (mode of modes; track mode.value) {
+        <div class="mode-card" [class.selected]="modeSelectionne === mode.value" (click)="selectMode(mode.value)">
+          <div class="mode-icon">
+            @if (mode.icon === 'pencil') {
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#1A73E8" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+            }
+            @if (mode.icon === 'camera') {
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#34A853" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                <circle cx="12" cy="13" r="3"/>
+              </svg>
+            }
+            @if (mode.icon === 'chip') {
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="#F59E0B" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
+              </svg>
+            }
+          </div>
+          <div class="mode-info">
+            <div class="mode-title">{{ mode.label }}</div>
+            <div class="mode-desc">{{ mode.desc }}</div>
+          </div>
+          <span class="mode-badge">{{ mode.badge }}</span>
+          @if (modeSelectionne === mode.value) {
+            <div class="mode-check">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    @if (errorMessage) {
+      <div class="error-box" style="margin-bottom:16px">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#EF4444" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+        {{ errorMessage }}
+      </div>
+    }
+
+    <button class="btn btn-primary btn-full" (click)="confirmer()" [disabled]="isLoading">
+      @if (isLoading) {
+        <span class="btn-spinner"></span> Configuration...
+      } @else {
+        Confirmer et continuer
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      }
+    </button>
+
+  </div>
+</div>

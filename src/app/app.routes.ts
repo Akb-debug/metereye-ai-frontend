@@ -1,57 +1,93 @@
-import { Routes } from '@angular/router';
-import { authGuard } from './guards/auth.guard';
+// 🔄 MODIFIÉ — app.routes.ts — routes complètes profil PERSONNEL avec lazy loading
 
-// Importation différée pour éviter d'importer des fichiers qui n'existent pas encore
-// Mais vu qu'ils seront créés juste après, on peut les importer normalement
-import { HomeComponent }          from './pages/home/home.component';
-import { LoginComponent }         from './pages/login/login.component';
-import { RegisterComponent }      from './pages/register/register.component';
-import { ProprietaireComponent }  from './pages/dashboard/proprietaire/proprietaire.component';
-import { LocataireComponent }     from './pages/dashboard/locataire/locataire.component';
-import { CashpowerComponent }     from './pages/dashboard/cashpower/cashpower.component';
-import { ClassiqueComponent }     from './pages/dashboard/classique/classique.component';
-import { AdminComponent }         from './pages/dashboard/admin/admin.component';
+import { Routes } from '@angular/router';
+import { authGuard, redirectIfLoggedInGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
 
-  // ── Routes publiques (sans token) ──────────────────
-  { path: '',         component: HomeComponent,     title: 'MeterEye AI' },
-  { path: 'login',    component: LoginComponent,    title: 'Connexion' },
-  { path: 'register', component: RegisterComponent, title: 'Inscription' },
+  // ── Landing page ────────────────────────────────
+  {
+    path: '',
+    loadComponent: () => import('./pages/home/home.component').then(m => m.HomeComponent),
+    title: 'MeterEye AI — Gestion de compteurs électriques'
+  },
 
-  // ── Routes privées (token obligatoire via authGuard) ──
+  // ── Auth ────────────────────────────────────────
   {
-    path: 'dashboard/proprietaire',
-    component: ProprietaireComponent,
-    canActivate: [authGuard],
-    title: 'Tableau de bord Propriétaire'
+    path: 'auth/login',
+    canActivate: [redirectIfLoggedInGuard],
+    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent),
+    title: 'Connexion — MeterEye AI'
   },
   {
-    path: 'dashboard/locataire',
-    component: LocataireComponent,
-    canActivate: [authGuard],
-    title: 'Tableau de bord Locataire'
+    path: 'auth/register',
+    canActivate: [redirectIfLoggedInGuard],
+    loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent),
+    title: 'Inscription — MeterEye AI'
   },
+
+  // ── Onboarding ──────────────────────────────────
+  {
+    path: 'onboarding/compteur',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/onboarding/create-compteur/create-compteur.component').then(m => m.CreateCompteurComponent),
+    title: 'Configurer votre compteur — MeterEye AI'
+  },
+  {
+    path: 'onboarding/mode-lecture',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/onboarding/choose-mode/choose-mode.component').then(m => m.ChooseModeComponent),
+    title: 'Mode de lecture — MeterEye AI'
+  },
+  {
+    path: 'onboarding/config-esp32',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/onboarding/config-esp32/config-esp32.component').then(m => m.ConfigEsp32Component),
+    title: 'Configuration ESP32-CAM — MeterEye AI'
+  },
+  {
+    path: 'onboarding/config-pzem',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/onboarding/config-pzem/config-pzem.component').then(m => m.ConfigPzemComponent),
+    title: 'Configuration PZEM-004T — MeterEye AI'
+  },
+
+  // ── Dashboards ──────────────────────────────────
   {
     path: 'dashboard/cashpower',
-    component: CashpowerComponent,
     canActivate: [authGuard],
-    title: 'Tableau de bord Cash Power'
+    loadComponent: () => import('./pages/dashboard/cashpower/cashpower.component').then(m => m.CashpowerComponent),
+    title: 'Tableau de bord Cash Power — MeterEye AI'
   },
   {
     path: 'dashboard/classique',
-    component: ClassiqueComponent,
     canActivate: [authGuard],
-    title: 'Tableau de bord Classique'
+    loadComponent: () => import('./pages/dashboard/classique/classique.component').then(m => m.ClassiqueComponent),
+    title: 'Tableau de bord Classique — MeterEye AI'
+  },
+
+  // ── Pages secondaires ───────────────────────────
+  {
+    path: 'historique',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/historique/historique.component').then(m => m.HistoriqueComponent),
+    title: 'Historique des relevés — MeterEye AI'
   },
   {
-    path: 'dashboard/admin',
-    component: AdminComponent,
+    path: 'alertes',
     canActivate: [authGuard],
-    title: 'Administration'
+    loadComponent: () => import('./pages/alertes/alertes.component').then(m => m.AlertesComponent),
+    title: 'Alertes — MeterEye AI'
+  },
+  {
+    path: 'profil',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/profil/profil.component').then(m => m.ProfilComponent),
+    title: 'Mon profil — MeterEye AI'
   },
 
-  // ── Route inconnue → accueil ────────────────────────
-  { path: '**', redirectTo: '' }
+  // ── Redirect + wildcard ─────────────────────────
+  { path: 'login',    redirectTo: 'auth/login',    pathMatch: 'full' },
+  { path: 'register', redirectTo: 'auth/register', pathMatch: 'full' },
+  { path: '**',       redirectTo: '' }
 ];
-

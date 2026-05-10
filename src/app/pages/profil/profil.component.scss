@@ -1,0 +1,53 @@
+// ✅ CRÉÉ — profil.component.scss
+
+.profil-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 20px;
+  align-items: start;
+
+  @media (max-width: 800px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.avatar-card {
+  text-align: center;
+  position: sticky;
+  top: 20px;
+}
+
+.big-avatar {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 28px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+}
+
+.avatar-name  { font-size: 18px; font-weight: 700; color: var(--color-dark); }
+.avatar-email { font-size: 13px; color: var(--color-text-light); margin-top: 4px; }
+
+.profil-right { display: flex; flex-direction: column; }
+
+.btn-danger-outline {
+  color: var(--color-danger) !important;
+  border-color: var(--color-danger) !important;
+  &:hover { background: var(--color-danger-light) !important; }
+}
+
+.btn-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: inline-block;
+  margin-right: 4px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

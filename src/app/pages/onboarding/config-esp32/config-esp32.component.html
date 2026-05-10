@@ -1,0 +1,110 @@
+<!-- ✅ CRÉÉ — config-esp32.component.html -->
+<app-toast></app-toast>
+
+<div class="auth-page" style="align-items:flex-start;padding-top:48px">
+  <div class="onboarding-card" style="max-width:580px">
+
+    <!-- Stepper 3/3 -->
+    <div class="stepper">
+      <div class="step done">
+        <div class="step-circle"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+        <span class="step-label">Compteur</span>
+      </div>
+      <div class="step-line done"></div>
+      <div class="step done">
+        <div class="step-circle"><svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg></div>
+        <span class="step-label">Mode lecture</span>
+      </div>
+      <div class="step-line active"></div>
+      <div class="step active">
+        <div class="step-circle">3</div>
+        <span class="step-label">Config. module</span>
+      </div>
+    </div>
+
+    <h2>Configuration ESP32-CAM</h2>
+    <p class="subtitle">Scannez votre module Bluetooth puis configurez le Wi-Fi</p>
+
+    <!-- Étape 1 : Scan Bluetooth -->
+    <div class="config-section">
+      <div class="section-header">
+        <div class="section-num" [class.done]="scanReussi">
+          @if (scanReussi) {
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+          } @else { 1 }
+        </div>
+        <span>Connexion Bluetooth</span>
+        @if (scanReussi) { <span class="badge badge-success">Connecté</span> }
+      </div>
+
+      <div class="form-group">
+        <label>Adresse Bluetooth du module</label>
+        <div class="input-row">
+          <input type="text" class="form-control" [formControl]="$any(scanForm.get('adresseBluetooth'))"
+            [class.is-invalid]="sf['adresseBluetooth'].invalid && sf['adresseBluetooth'].touched"
+            placeholder="Ex : ESP32-CAM-001 ou AA:BB:CC:DD:EE:FF"
+            [readonly]="scanReussi"/>
+          <button class="btn btn-outline-primary" (click)="scanner()" [disabled]="isScanning || scanReussi">
+            @if (isScanning) { <span class="btn-spinner"></span> } Scanner
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Étape 2 : Configuration Wi-Fi (visible si scan réussi) -->
+    @if (scanReussi) {
+      <div class="config-section">
+        <div class="section-header">
+          <div class="section-num">2</div>
+          <span>Configuration Wi-Fi</span>
+        </div>
+
+        <form [formGroup]="wifiForm">
+          <div class="form-group">
+            <label>Nom du réseau Wi-Fi (SSID)</label>
+            <input type="text" class="form-control" formControlName="ssid"
+              [class.is-invalid]="wf['ssid'].invalid && wf['ssid'].touched"
+              placeholder="Mon_WiFi"/>
+            @if (wf['ssid'].invalid && wf['ssid'].touched) {
+              <span class="error-msg">Le nom du réseau est requis.</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label>Mot de passe Wi-Fi</label>
+            <input type="password" class="form-control" formControlName="motDePasseWifi"
+              [class.is-invalid]="wf['motDePasseWifi'].invalid && wf['motDePasseWifi'].touched"
+              placeholder="Minimum 8 caractères"/>
+            @if (wf['motDePasseWifi'].invalid && wf['motDePasseWifi'].touched) {
+              <span class="error-msg">Minimum 8 caractères.</span>
+            }
+          </div>
+        </form>
+
+        @if (errorMessage) {
+          <div class="error-box" style="margin-bottom:16px">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#EF4444" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+            {{ errorMessage }}
+          </div>
+        }
+
+        <button class="btn btn-primary btn-full" (click)="configurer()" [disabled]="isConfiguring">
+          @if (isConfiguring) {
+            <span class="btn-spinner"></span> Configuration en cours...
+          } @else {
+            Terminer la configuration
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+          }
+        </button>
+      </div>
+    }
+
+    @if (!scanReussi && errorMessage) {
+      <div class="error-box" style="margin-top:16px">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#EF4444" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+        {{ errorMessage }}
+      </div>
+    }
+
+  </div>
+</div>

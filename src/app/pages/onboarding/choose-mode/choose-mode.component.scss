@@ -1,0 +1,57 @@
+// ✅ CRÉÉ — choose-mode.component.scss
+
+.mode-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  background: var(--color-white);
+  transition: all var(--transition);
+  position: relative;
+
+  &:hover { border-color: var(--color-primary); transform: translateX(3px); }
+
+  &.selected {
+    border-color: var(--color-primary);
+    background: var(--color-primary-light);
+  }
+}
+
+.mode-icon {
+  width: 46px; height: 46px;
+  background: #F3F4F6;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mode-info { flex: 1; }
+.mode-title { font-size: 14px; font-weight: 600; color: var(--color-dark); }
+.mode-desc  { font-size: 12px; color: var(--color-text-light); margin-top: 2px; line-height: 1.4; }
+
+.mode-badge {
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--color-bg);
+  color: var(--color-text-light);
+  padding: 3px 10px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.mode-check {
+  width: 20px; height: 20px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-spinner { width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;margin-right:4px; }
+@keyframes spin { to { transform:rotate(360deg); } }

@@ -1,0 +1,120 @@
+// ✅ CRÉÉ — alertes.component.scss
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--color-border);
+  margin-bottom: 20px;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-light);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  cursor: pointer;
+  transition: all var(--transition);
+
+  &:hover { color: var(--color-primary); }
+
+  &.active {
+    color: var(--color-primary);
+    border-bottom-color: var(--color-primary);
+    font-weight: 600;
+  }
+}
+
+.tab-badge {
+  background: var(--color-danger);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+}
+
+.alerte-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.alerte-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px 20px;
+  background: #fff;
+  border-radius: var(--radius-md);
+  border: 1.5px solid var(--color-border);
+  cursor: pointer;
+  transition: all var(--transition);
+
+  &:hover { border-color: var(--color-primary); box-shadow: var(--shadow-sm); }
+
+  &.unread {
+    border-color: var(--color-primary-light);
+    background: #FAFCFF;
+  }
+}
+
+.alerte-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  margin-top: 4px;
+  flex-shrink: 0;
+
+  &.dot-danger  { background: var(--color-danger); }
+  &.dot-warning { background: var(--color-warning); }
+  &.dot-success { background: var(--color-success); }
+  &.dot-info    { background: var(--color-primary); }
+}
+
+.alerte-body { flex: 1; min-width: 0; }
+
+.alerte-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.alerte-ref {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.alerte-date {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.alerte-message {
+  font-size: 14px;
+  color: var(--color-text);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.unread-chip {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  padding: 2px 10px;
+  border-radius: 99px;
+}
