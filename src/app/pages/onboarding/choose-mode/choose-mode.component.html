@@ -1,28 +1,54 @@
-<!-- ✅ CRÉÉ — choose-mode.component.html -->
 <app-toast></app-toast>
 
-<div class="auth-page" style="align-items:flex-start;padding-top:48px">
-  <div class="onboarding-card">
-
-    <!-- Stepper 2/2 -->
-    <div class="stepper">
-      <div class="step done">
-        <div class="step-circle">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-        </div>
-        <span class="step-label">Votre compteur</span>
-      </div>
-      <div class="step-line done"></div>
-      <div class="step active">
-        <div class="step-circle">2</div>
-        <span class="step-label">Mode de lecture</span>
-      </div>
+<!-- Top nav -->
+<header class="onb-header">
+  <div class="onb-logo">
+    <div class="logo-icon">
+      <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5">
+        <circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 3"/>
+      </svg>
     </div>
+    <span>MeterEye<strong>AI</strong></span>
+  </div>
+  <div class="onb-user">
+    Connecté en tant que <strong>{{ nomComplet }}</strong>
+    <span class="sep">·</span>
+    <button type="button" class="onb-btn-link" (click)="seDeconnecter()">Se déconnecter</button>
+  </div>
+</header>
 
-    <h2>Comment lirez-vous votre compteur ?</h2>
-    <p class="subtitle">Choisissez le mode adapté à votre installation</p>
+<!-- Stepper -->
+<div class="onb-stepper-wrap">
+  <div class="onb-stepper">
+    <div class="onb-step done">
+      <div class="onb-step-num">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <span class="onb-step-label">Compteur</span>
+    </div>
+    <div class="onb-step-line done"></div>
+    <div class="onb-step active">
+      <div class="onb-step-num">2</div>
+      <span class="onb-step-label">Mode de lecture</span>
+    </div>
+    <div class="onb-step-line"></div>
+    <div class="onb-step">
+      <div class="onb-step-num">3</div>
+      <span class="onb-step-label">Dashboard</span>
+    </div>
+  </div>
+</div>
 
-    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:28px">
+<!-- Card -->
+<div class="onb-page">
+  <div class="onb-card">
+
+    <h2 class="onb-title">Mode de lecture</h2>
+    <p class="onb-subtitle">Choisissez comment vous souhaitez <span class="text-primary">relever</span> votre compteur.</p>
+
+    <div class="mode-list">
       @for (mode of modes; track mode.value) {
         <div class="mode-card" [class.selected]="modeSelectionne === mode.value" (click)="selectMode(mode.value)">
           <div class="mode-icon">
@@ -50,7 +76,9 @@
           <span class="mode-badge">{{ mode.badge }}</span>
           @if (modeSelectionne === mode.value) {
             <div class="mode-check">
-              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
             </div>
           }
         </div>
@@ -59,19 +87,21 @@
 
     @if (errorMessage) {
       <div class="error-box" style="margin-bottom:16px">
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#EF4444" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#EF4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
         {{ errorMessage }}
       </div>
     }
 
-    <button class="btn btn-primary btn-full" (click)="confirmer()" [disabled]="isLoading">
-      @if (isLoading) {
-        <span class="btn-spinner"></span> Configuration...
-      } @else {
-        Confirmer et continuer
-        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
-      }
-    </button>
+    <div class="onb-actions">
+      <button type="button" class="onb-btn-back" (click)="router.navigate(['/onboarding/compteur'])">← Retour</button>
+      <button class="btn btn-primary" (click)="confirmer()" [disabled]="isLoading">
+        @if (isLoading) {
+          <span class="btn-spinner"></span> Configuration...
+        } @else {
+          Continuer →
+        }
+      </button>
+    </div>
 
   </div>
 </div>

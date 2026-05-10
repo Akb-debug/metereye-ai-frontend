@@ -48,8 +48,10 @@ export class CompteurService {
   }
 
   getCompteurIdSauvegarde(): number | null {
-    const id = localStorage.getItem(STORAGE_KEYS.compteurId);
-    return id ? +id : null;
+    const raw = localStorage.getItem(STORAGE_KEYS.compteurId);
+    if (raw === null) return null;
+    const id = parseInt(raw, 10);
+    return id > 0 ? id : null;
   }
 
   sauvegarderTypeCompteur(type: string): void {
