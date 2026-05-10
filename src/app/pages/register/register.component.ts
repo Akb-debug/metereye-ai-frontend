@@ -1,12 +1,16 @@
-// 🔄 MODIFIÉ — register.component.ts — fix: auto-login après inscription
-
 import { Component, inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { ToastService } from '../../services/toast.service';
 import { ToastComponent } from '../../shared/toast/toast.component';
+
+function passwordMatchValidator(group: AbstractControl): ValidationErrors | null {
+  const pwd     = group.get('motDePasse')?.value;
+  const confirm = group.get('confirmMotDePasse')?.value;
+  return pwd && confirm && pwd !== confirm ? { passwordMismatch: true } : null;
+}
 
 @Component({
   selector: 'app-register',
@@ -23,76 +27,74 @@ export class RegisterComponent implements OnInit {
   private toast       = inject(ToastService);
 
   registerForm!: FormGroup;
-  isLoading    = false;
-  errorMessage = '';
-  showPassword = false;
+  isLoading           = false;
+  errorMessage        = '';
+  showPassword        = false;
+  showConfirmPassword = false;
 
   roleOptions = [
     {
       value: 'PERSONNEL',
-      label: 'Compte Personnel',
-      desc: 'Vous avez votre propre compteur et souhaitez suivre votre consommation personnelle.',
-      icon: 'user'
+      label: 'Personnel',
+      desc:  'Particulier avec son propre compteur Cash Power ou Classique.',
+      icon:  'user'
     },
     {
       value: 'PROPRIETAIRE',
       label: 'Propriétaire',
-      desc: 'Vous gérez plusieurs compteurs pour vos locataires ou co-propriétaires.',
-      icon: 'building'
+      desc:  'Maison avec plusieurs locataires à gérer en sous-comptes.',
+      icon:  'building'
     }
   ];
 
   selectedRole = 'PERSONNEL';
 
   ngOnInit(): void {
-    this.registerForm = this.fb.group({
-      nom:        ['', [Validators.required, Validators.minLength(2)]],
-      prenom:     ['', [Validators.required, Validators.minLength(2)]],
-      email:      ['', [Validators.required, Validators.email]],
-      telephone:  ['', [Validators.required, Validators.pattern(/^[0-9+\s-]{8,}$/)]],
-      motDePasse: ['', [Validators.required, Validators.minLength(6)]]
-    });
+    this.registerForm = this.fb.group(
+      {
+        prenom:             ['', [Validators.required, Validators.minLength(2)]],
+        nom:                ['', [Validators.required, Validators.minLength(2)]],
+        email:              ['', [Validators.required, Validators.email]],
+        telephone:          ['', [Validators.required, Validators.pattern(/^[0-9\s-]{6,}$/)]],
+        motDePasse:         ['', [Validators.required, Validators.minLength(6)]],
+        confirmMotDePasse:  ['', Validators.required]
+      },
+      { validators: passwordMatchValidator }
+    );
   }
 
   get f() { return this.registerForm.controls; }
+
+  get passwordMismatch(): boolean {
+    return !!(
+      this.registerForm.hasError('passwordMismatch') &&
+      this.f['confirmMotDePasse'].touched
+    );
+  }
 
   selectRole(role: string): void {
     this.selectedRole = role;
   }
 
   onSubmit(): void {
-    if (this.registerForm.invalid) {
-      this.registerForm.markAllAsTouched();
-      return;
-    }
+    this.registerForm.markAllAsTouched();
+    if (this.registerForm.invalid) return;
 
     this.isLoading    = true;
     this.errorMessage = '';
 
-    const payload = {
-      ...this.registerForm.value,
-      role: this.selectedRole
-    };
+    const { confirmMotDePasse, ...formData } = this.registerForm.value;
+    const payload = { ...formData, role: this.selectedRole };
 
     this.authService.register(payload).subscribe({
       next: () => {
-        // Token stocké par auth.service.login() via switchMap — redirection directe
         this.isLoading = false;
         this.toast.success('Compte créé avec succès ! Bienvenue sur MeterEye AI.');
         this.router.navigate(['/onboarding/compteur']);
       },
-      error: (err) => {
-        this.isLoading = false;
-        // err.message est traduit par l'intercepteur HTTP
-        // Un 409 (email déjà utilisé) ou 400 (données invalides) donne un message explicite
-        const msg: string = err?.message ?? '';
-        if (msg.includes('invalide') || msg.includes('Données') || msg.includes('utilisé')) {
-          this.errorMessage = msg;
-        } else if (msg) {
-          this.errorMessage = msg;
-        } else {
-          this.errorMessage = 'Erreur serveur, réessayez plus tard.';
-        }
+      error: (err: Error) => {
+        this.isLoading    = false;
+        this.errorMessage = err?.message ?? 'Erreur serveur, réessayez plus tard.';
       }
     });
   }

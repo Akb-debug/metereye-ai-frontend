@@ -1,57 +1,126 @@
-// ✅ CRÉÉ — register.component.scss
+.register-card {
+  max-width: 560px;
+}
 
-.role-cards {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
+// Role cards — 2-column grid
+.role-cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 22px;
 }
 
 .role-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 14px;
-  padding: 14px 16px;
+  gap: 8px;
+  padding: 18px 12px 14px;
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
   cursor: pointer;
   background: var(--color-white);
   transition: all var(--transition);
   position: relative;
+  text-align: center;
 
   &:hover { border-color: var(--color-primary); }
 
   &.selected {
     border-color: var(--color-primary);
-    background: var(--color-primary-light);
+    background: #EBF3FF;
   }
 }
 
-.role-card-icon {
-  width: 42px; height: 42px;
-  border-radius: var(--radius-sm);
-  background: var(--color-bg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--color-primary);
-}
-
-.role-card-text { flex: 1; }
-.role-card-title { font-size: 14px; font-weight: 600; color: var(--color-dark); }
-.role-card-desc  { font-size: 12px; color: var(--color-text-light); margin-top: 2px; line-height: 1.4; }
-
 .role-check {
-  width: 22px; height: 22px;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
   background: var(--color-primary);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
 
+.role-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+
+  &.icon-blue {
+    background: #DBEAFE;
+    color: #2563EB;
+  }
+  &.icon-green {
+    background: #DCFCE7;
+    color: #16A34A;
+  }
+}
+
+.role-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-dark);
+}
+
+.role-card-desc {
+  font-size: 11px;
+  color: var(--color-text-light);
+  line-height: 1.4;
+}
+
+// Phone input with flag prefix
+.phone-input-wrap {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--color-white);
+  transition: border-color var(--transition);
+
+  &:focus-within { border-color: var(--color-primary); }
+
+  &.is-invalid { border-color: var(--color-danger); }
+}
+
+.phone-prefix {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 10px;
+  border-right: 1.5px solid var(--color-border);
+  height: 42px;
+  background: var(--color-bg);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.phone-flag { font-size: 16px; line-height: 1; }
+
+.phone-code {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.phone-input {
+  border: none !important;
+  border-radius: 0 !important;
+  flex: 1;
+  box-shadow: none !important;
+
+  &:focus { outline: none; box-shadow: none !important; }
+}
+
+// Password input with toggle
 .input-group {
   position: relative;
   display: flex;
@@ -72,13 +141,17 @@
   }
 }
 
+// Loading spinner on button
 .btn-spinner {
-  width: 16px; height: 16px;
-  border: 2px solid rgba(255,255,255,.4);
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, .4);
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin .7s linear infinite;
   display: inline-block;
   margin-right: 4px;
+  vertical-align: middle;
 }
+
 @keyframes spin { to { transform: rotate(360deg); } }

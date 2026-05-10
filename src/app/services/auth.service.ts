@@ -78,10 +78,10 @@ export class AuthService {
   }
 
   private sauvegarderSession(r: AuthResponse): void {
-    localStorage.setItem(STORAGE_KEYS.token,      r.token);
-    localStorage.setItem(STORAGE_KEYS.role,       r.role);
-    localStorage.setItem(STORAGE_KEYS.nomComplet, `${r.prenom} ${r.nom}`);
-    localStorage.setItem(STORAGE_KEYS.userId,     r.id.toString());
+    localStorage.setItem(STORAGE_KEYS.token,      r.token ?? '');
+    localStorage.setItem(STORAGE_KEYS.role,       r.role  ?? '');
+    localStorage.setItem(STORAGE_KEYS.nomComplet, `${r.prenom ?? ''} ${r.nom ?? ''}`.trim());
+    localStorage.setItem(STORAGE_KEYS.userId,     (r.id ?? 0).toString());
 
     this.userStateSubject.next({ isLoggedIn: true, user: r });
   }
