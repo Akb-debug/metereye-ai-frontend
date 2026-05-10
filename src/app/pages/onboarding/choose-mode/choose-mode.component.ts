@@ -1,9 +1,8 @@
-// ✅ CRÉÉ — choose-mode.component.ts
-
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CompteurService } from '../../../services/compteur.service';
+import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { ToastComponent } from '../../../shared/toast/toast.component';
 import { ModeLecture } from '../../../models/compteur.model';
@@ -19,39 +18,46 @@ import { STORAGE_KEYS } from '../../../config/app.config.api';
 export class ChooseModeComponent {
 
   private compteurService = inject(CompteurService);
-  private router          = inject(Router);
+  private authService     = inject(AuthService);
+  readonly router         = inject(Router);
   private toast           = inject(ToastService);
 
   isLoading         = false;
   errorMessage      = '';
   modeSelectionne: ModeLecture = 'MANUAL';
 
+  get nomComplet(): string { return this.authService.getNomComplet(); }
+
   modes = [
     {
       value: 'MANUAL' as ModeLecture,
       label: 'Saisie manuelle',
-      desc: 'Entrez vous-même la valeur de votre compteur quand vous le souhaitez.',
-      icon: 'pencil',
+      desc:  'Entrez vous-même la valeur de votre compteur quand vous le souhaitez.',
+      icon:  'pencil',
       badge: 'Simple'
     },
     {
       value: 'ESP32_CAM' as ModeLecture,
       label: 'ESP32-CAM',
-      desc: 'Un module caméra photographie votre compteur automatiquement. Relevés sans intervention.',
-      icon: 'camera',
+      desc:  'Un module caméra photographie votre compteur automatiquement.',
+      icon:  'camera',
       badge: 'Automatique'
     },
     {
       value: 'SENSOR' as ModeLecture,
       label: 'Capteur PZEM-004T',
-      desc: 'Capteur de mesure directe branché sur votre installation. Données en temps réel.',
-      icon: 'chip',
+      desc:  'Capteur de mesure directe branché sur votre installation. Données en temps réel.',
+      icon:  'chip',
       badge: 'Temps réel'
     }
   ];
 
   selectMode(mode: ModeLecture): void {
     this.modeSelectionne = mode;
+  }
+
+  seDeconnecter(): void {
+    this.authService.logout();
   }
 
   confirmer(): void {
@@ -67,6 +73,7 @@ export class ChooseModeComponent {
 
     this.compteurService.setModeLecture(compteurId, this.modeSelectionne).subscribe({
       next: () => {
+        this.isLoading = false;
         this.toast.success('Mode de lecture configuré !');
         if (this.modeSelectionne === 'MANUAL') {
           this.redirectDashboard();
@@ -76,19 +83,17 @@ export class ChooseModeComponent {
           this.router.navigate(['/onboarding/config-pzem']);
         }
       },
-      error: (err) => {
+      error: (err: Error) => {
         this.errorMessage = err.message;
-        this.isLoading = false;
+        this.isLoading    = false;
       }
     });
   }
 
   private redirectDashboard(): void {
     const type = localStorage.getItem(STORAGE_KEYS.typeCompteur);
-    if (type === 'CASH_POWER') {
-      this.router.navigate(['/dashboard/cashpower']);
-    } else {
-      this.router.navigate(['/dashboard/classique']);
-    }
+    this.router.navigate(
+      type === 'CASH_POWER' ? ['/dashboard/cashpower'] : ['/dashboard/classique']
+    );
   }
 }

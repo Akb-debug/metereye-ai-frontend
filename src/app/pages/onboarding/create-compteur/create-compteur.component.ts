@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { switchMap, tap, of } from 'rxjs';
 import { CompteurService } from '../../../services/compteur.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
@@ -48,24 +49,36 @@ export class CreateCompteurComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
+    this.form.markAllAsTouched();
+    if (this.form.invalid) return;
 
     this.isLoading    = true;
     this.errorMessage = '';
 
-    const payload = {
-      ...this.form.value,
-      typeCompteur: this.typeSelectionne
-    };
+    const payload = { ...this.form.value, typeCompteur: this.typeSelectionne };
 
-    this.compteurService.createCompteur(payload).subscribe({
-      next: (compteur) => {
+    this.compteurService.createCompteur(payload).pipe(
+      switchMap((compteur) => {
+        if (compteur?.id) {
+          // Backend returned the created compteur with its ID
+          this.compteurService.sauvegarderCompteurId(compteur.id);
+          this.compteurService.sauvegarderTypeCompteur(compteur.typeCompteur ?? this.typeSelectionne);
+          return of(null);
+        }
+        // Backend returned 201 No Content — recover ID via GET /compteurs
+        return this.compteurService.getMesCompteurs().pipe(
+          tap((list) => {
+            const c = list?.[list.length - 1];
+            if (c?.id) {
+              this.compteurService.sauvegarderCompteurId(c.id);
+              this.compteurService.sauvegarderTypeCompteur(c.typeCompteur);
+            }
+          })
+        );
+      })
+    ).subscribe({
+      next: () => {
         this.isLoading = false;
-        this.compteurService.sauvegarderCompteurId(compteur?.id ?? 0);
-        this.compteurService.sauvegarderTypeCompteur(compteur?.typeCompteur ?? this.typeSelectionne);
         this.toast.success('Compteur enregistré avec succès !');
         this.router.navigate(['/onboarding/mode-lecture']);
       },
