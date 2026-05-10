@@ -1,10 +1,9 @@
-// ✅ CRÉÉ — create-compteur.component.ts
-
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { CompteurService } from '../../../services/compteur.service';
+import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { ToastComponent } from '../../../shared/toast/toast.component';
 
@@ -19,18 +18,22 @@ export class CreateCompteurComponent implements OnInit {
 
   private fb              = inject(FormBuilder);
   private compteurService = inject(CompteurService);
+  private authService     = inject(AuthService);
   private router          = inject(Router);
   private toast           = inject(ToastService);
 
   form!: FormGroup;
-  isLoading    = false;
-  errorMessage = '';
+  isLoading              = false;
+  errorMessage           = '';
   typeSelectionne: 'CLASSIQUE' | 'CASH_POWER' = 'CASH_POWER';
+
+  get nomComplet(): string { return this.authService.getNomComplet(); }
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      reference: ['', [Validators.required, Validators.minLength(4)]],
-      adresse:   ['', [Validators.required, Validators.minLength(5)]]
+      reference:      ['', [Validators.required, Validators.minLength(4)]],
+      adresse:        ['', [Validators.required, Validators.minLength(5)]],
+      valeurInitiale: [null, [Validators.required, Validators.min(0)]]
     });
   }
 
@@ -38,6 +41,10 @@ export class CreateCompteurComponent implements OnInit {
 
   selectType(type: 'CLASSIQUE' | 'CASH_POWER'): void {
     this.typeSelectionne = type;
+  }
+
+  seDeconnecter(): void {
+    this.authService.logout();
   }
 
   onSubmit(): void {
@@ -61,9 +68,9 @@ export class CreateCompteurComponent implements OnInit {
         this.toast.success('Compteur enregistré avec succès !');
         this.router.navigate(['/onboarding/mode-lecture']);
       },
-      error: (err) => {
+      error: (err: Error) => {
         this.errorMessage = err.message;
-        this.isLoading = false;
+        this.isLoading    = false;
       }
     });
   }
