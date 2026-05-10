@@ -68,22 +68,20 @@ export class LoginComponent implements OnInit {
   private redirectApresLogin(): void {
     this.compteurService.getMesCompteurs().subscribe({
       next: (compteurs) => {
+        this.isLoading = false;
         if (!compteurs || compteurs.length === 0) {
           this.router.navigate(['/onboarding/compteur']);
         } else {
           const c = compteurs[0];
           this.compteurService.sauvegarderCompteurId(c.id);
           this.compteurService.sauvegarderTypeCompteur(c.typeCompteur);
-
-          if (c.typeCompteur === 'CASH_POWER') {
-            this.router.navigate(['/dashboard/cashpower']);
-          } else {
-            this.router.navigate(['/dashboard/classique']);
-          }
+          this.router.navigate(
+            c.typeCompteur === 'CASH_POWER' ? ['/dashboard/cashpower'] : ['/dashboard/classique']
+          );
         }
       },
       error: () => {
-        // En cas d'erreur API compteurs → onboarding
+        this.isLoading = false;
         this.router.navigate(['/onboarding/compteur']);
       }
     });
