@@ -115,8 +115,10 @@ function handleError(error: HttpErrorResponse, router: Router) {
                 'Vérifie que le backend Spring Boot tourne sur le port 8080.';
       break;
     case 400:
-      // Données invalides envoyées au backend
       message = error.error?.message || 'Données invalides. Vérifie le formulaire.';
+      break;
+    case 409:
+      message = error.error?.message || 'Cette adresse email est déjà utilisée.';
       break;
     case 401:
       // Non authentifié

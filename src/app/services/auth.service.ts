@@ -1,8 +1,9 @@
-// 🔄 MODIFIÉ — auth.service.ts — ajouts : getMe(), getUserRole(), redirection dashboard
+// 🔄 MODIFIÉ — auth.service.ts — fix: auto-login après inscription (register ne retourne pas de token)
 
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { switchMap, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { AuthResponse, LoginRequest, RegisterRequest, UserState } from '../models/user.model';
 import { API_URLS, STORAGE_KEYS } from '../config/app.config.api';
@@ -31,8 +32,12 @@ export class AuthService {
   }
 
   register(request: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(API_URLS.register, request).pipe(
-      tap((r: AuthResponse) => this.sauvegarderSession(r))
+    // POST /api/auth/register crée l'utilisateur sans retourner de token.
+    // On enchaîne automatiquement un login() pour obtenir le token JWT.
+    return this.http.post<any>(API_URLS.register, request).pipe(
+      switchMap(() =>
+        this.login({ email: request.email, motDePasse: request.motDePasse })
+      )
     );
   }
 

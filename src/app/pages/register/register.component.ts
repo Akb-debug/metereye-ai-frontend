@@ -1,4 +1,4 @@
-// 🔄 MODIFIÉ — register.component.ts — ajouts : cards PERSONNEL/PROPRIÉTAIRE, design system, redirection onboarding
+// 🔄 MODIFIÉ — register.component.ts — fix: auto-login après inscription
 
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -76,12 +76,23 @@ export class RegisterComponent implements OnInit {
 
     this.authService.register(payload).subscribe({
       next: () => {
+        // Token stocké par auth.service.login() via switchMap — redirection directe
+        this.isLoading = false;
         this.toast.success('Compte créé avec succès ! Bienvenue sur MeterEye AI.');
         this.router.navigate(['/onboarding/compteur']);
       },
       error: (err) => {
-        this.errorMessage = err.message;
         this.isLoading = false;
+        // err.message est traduit par l'intercepteur HTTP
+        // Un 409 (email déjà utilisé) ou 400 (données invalides) donne un message explicite
+        const msg: string = err?.message ?? '';
+        if (msg.includes('invalide') || msg.includes('Données') || msg.includes('utilisé')) {
+          this.errorMessage = msg;
+        } else if (msg) {
+          this.errorMessage = msg;
+        } else {
+          this.errorMessage = 'Erreur serveur, réessayez plus tard.';
+        }
       }
     });
   }
