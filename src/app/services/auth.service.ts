@@ -1,5 +1,4 @@
-// Rôle : Gère les requêtes HTTP de login/register et l'état de connexion.
-// Ce service n'ajoute pas le token lui-même (c'est le rôle de l'intercepteur).
+// 🔄 MODIFIÉ — auth.service.ts — ajouts : getMe(), getUserRole(), redirection dashboard
 
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -8,143 +7,95 @@ import { Router } from '@angular/router';
 import { AuthResponse, LoginRequest, RegisterRequest, UserState } from '../models/user.model';
 import { API_URLS, STORAGE_KEYS } from '../config/app.config.api';
 
-@Injectable({
-  providedIn: 'root' // disponible dans toute l'application
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  // Injection des dépendances (style moderne Angular)
   private http   = inject(HttpClient);
   private router = inject(Router);
 
-  // BehaviorSubject = stocke l'état courant ET émet aux abonnés à chaque changement
-  // Valeur initiale = non connecté
   private userStateSubject = new BehaviorSubject<UserState>({
     isLoggedIn: false,
     user: null
   });
 
-  // Observable public que les composants peuvent écouter
-  // On utilise $ comme convention pour les Observables
   public currentUser$ = this.userStateSubject.asObservable();
 
   constructor() {
-    // Au démarrage du service, restaurer la session si token présent
     this.restaurerSession();
   }
 
-  // ─────────────────────────────────────────────
-  // CONNEXION
-  // ─────────────────────────────────────────────
-  // Envoie email + mot de passe au backend
-  // Si succès → sauvegarde le token et met à jour l'état
   login(request: LoginRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(API_URLS.login, request).pipe(
-      tap((response: AuthResponse) => {
-        // tap = effet de bord sans modifier la valeur de l'Observable
-        this.sauvegarderSession(response);
-      })
+      tap((r: AuthResponse) => this.sauvegarderSession(r))
     );
-    // Note : les erreurs sont gérées par l'intercepteur
-    // Le composant qui appelle login() recevra un message d'erreur
-    // déjà traduit en français par handleError() dans l'intercepteur
   }
 
-  // ─────────────────────────────────────────────
-  // INSCRIPTION
-  // ─────────────────────────────────────────────
-  // Envoie toutes les infos du nouvel utilisateur au backend
   register(request: RegisterRequest): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(API_URLS.register, request).pipe(
-      tap((response: AuthResponse) => {
-        this.sauvegarderSession(response);
-      })
+      tap((r: AuthResponse) => this.sauvegarderSession(r))
     );
   }
 
-  // ─────────────────────────────────────────────
-  // DÉCONNEXION
-  // ─────────────────────────────────────────────
-  // Efface toutes les données de session et redirige vers /login
-  logout(): void {
-    // Supprimer toutes les clés du localStorage
-    Object.values(STORAGE_KEYS).forEach(key => {
-      localStorage.removeItem(key);
-    });
-
-    // Remettre l'état à "non connecté"
-    this.userStateSubject.next({
-      isLoggedIn: false,
-      user: null
-    });
-
-    // Rediriger vers la page de connexion
-    this.router.navigate(['/login']);
+  getMe(): Observable<AuthResponse> {
+    return this.http.get<AuthResponse>(API_URLS.me);
   }
 
-  // ─────────────────────────────────────────────
-  // GETTERS PRATIQUES
-  // ─────────────────────────────────────────────
+  logout(): void {
+    Object.values(STORAGE_KEYS).forEach(k => localStorage.removeItem(k));
+    this.userStateSubject.next({ isLoggedIn: false, user: null });
+    this.router.navigate(['/auth/login']);
+  }
 
-  // Retourne true si l'utilisateur est connecté
   isLoggedIn(): boolean {
     return !!localStorage.getItem(STORAGE_KEYS.token);
   }
 
-  // Retourne le token JWT depuis localStorage
   getToken(): string | null {
     return localStorage.getItem(STORAGE_KEYS.token);
   }
 
-  // Retourne le rôle de l'utilisateur connecté
-  getRole(): string | null {
+  getUserRole(): string | null {
     return localStorage.getItem(STORAGE_KEYS.role);
   }
 
-  // Retourne le nom complet de l'utilisateur connecté
-  getNomComplet(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.nomComplet);
+  getUserId(): number | null {
+    const id = localStorage.getItem(STORAGE_KEYS.userId);
+    return id ? +id : null;
   }
 
-  // Retourne l'état courant (snapshot, pas un Observable)
+  getNomComplet(): string {
+    const nom = localStorage.getItem(STORAGE_KEYS.nomComplet);
+    return nom ?? 'Utilisateur';
+  }
+
   getCurrentUserState(): UserState {
     return this.userStateSubject.getValue();
   }
 
-  // ─────────────────────────────────────────────
-  // MÉTHODES PRIVÉES
-  // ─────────────────────────────────────────────
+  private sauvegarderSession(r: AuthResponse): void {
+    localStorage.setItem(STORAGE_KEYS.token,      r.token);
+    localStorage.setItem(STORAGE_KEYS.role,       r.role);
+    localStorage.setItem(STORAGE_KEYS.nomComplet, `${r.prenom} ${r.nom}`);
+    localStorage.setItem(STORAGE_KEYS.userId,     r.id.toString());
 
-  // Sauvegarde les données de session après login/register réussi
-  private sauvegarderSession(response: AuthResponse): void {
-    localStorage.setItem(STORAGE_KEYS.token,      response.token);
-    localStorage.setItem(STORAGE_KEYS.role,       response.role);
-    localStorage.setItem(STORAGE_KEYS.nomComplet, response.nomComplet);
-    localStorage.setItem(STORAGE_KEYS.userId,     response.userId.toString());
-
-    // Mettre à jour l'état global
-    this.userStateSubject.next({
-      isLoggedIn: true,
-      user: response
-    });
+    this.userStateSubject.next({ isLoggedIn: true, user: r });
   }
 
-  // Restaure la session depuis localStorage au démarrage de l'app
   private restaurerSession(): void {
-    const token      = localStorage.getItem(STORAGE_KEYS.token);
-    const role       = localStorage.getItem(STORAGE_KEYS.role);
-    const nomComplet = localStorage.getItem(STORAGE_KEYS.nomComplet);
-    const userId     = localStorage.getItem(STORAGE_KEYS.userId);
+    const token = localStorage.getItem(STORAGE_KEYS.token);
+    const role  = localStorage.getItem(STORAGE_KEYS.role);
 
-    if (token && role && nomComplet && userId) {
-      // Session valide trouvée → restaurer l'état
+    if (token && role) {
       this.userStateSubject.next({
         isLoggedIn: true,
         user: {
           token,
+          type:   'Bearer',
+          id:     +(localStorage.getItem(STORAGE_KEYS.userId) ?? 0),
+          email:  '',
           role,
-          nomComplet,
-          userId: parseInt(userId)
+          nom:    '',
+          prenom: localStorage.getItem(STORAGE_KEYS.nomComplet) ?? ''
         }
       });
     }

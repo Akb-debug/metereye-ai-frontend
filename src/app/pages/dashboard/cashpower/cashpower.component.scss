@@ -1,0 +1,88 @@
+// ✅ CRÉÉ — cashpower.component.scss
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr 1fr;
+    .credit-card { grid-column: 1 / -1; }
+  }
+}
+
+.credit-card {
+  grid-column: span 1;
+}
+
+.credit-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: var(--color-text-light);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.credit-value {
+  font-size: 48px;
+  font-weight: 800;
+  color: var(--color-success);
+  line-height: 1;
+
+  &.warning { color: var(--color-warning); }
+  &.danger  { color: var(--color-danger); }
+}
+
+.credit-icon {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  background: var(--color-success-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  stroke: var(--color-success);
+
+  &.icon-warning { background: var(--color-warning-light); stroke: var(--color-warning); }
+  &.icon-danger  { background: var(--color-danger-light);  stroke: var(--color-danger); }
+}
+
+.credit-footer {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 8px;
+}
+
+.alert-low {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: var(--color-danger-light);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--color-danger);
+  font-weight: 500;
+  animation: pulse 2s infinite;
+}
+
+.btn-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: inline-block;
+  margin-right: 4px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.6; } }

@@ -1,0 +1,62 @@
+// ✅ CRÉÉ — compteur.service.ts
+
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { CompteurRequest, CompteurResponse, StatutConfig, StatsResponse, ModeLecture } from '../models/compteur.model';
+import { API_URLS, STORAGE_KEYS } from '../config/app.config.api';
+
+@Injectable({ providedIn: 'root' })
+export class CompteurService {
+
+  private http = inject(HttpClient);
+
+  createCompteur(data: CompteurRequest): Observable<CompteurResponse> {
+    return this.http.post<CompteurResponse>(API_URLS.compteurs, data);
+  }
+
+  getMesCompteurs(): Observable<CompteurResponse[]> {
+    return this.http.get<CompteurResponse[]>(API_URLS.compteurs);
+  }
+
+  getCompteur(id: number): Observable<CompteurResponse> {
+    return this.http.get<CompteurResponse>(API_URLS.compteur(id));
+  }
+
+  setModeLecture(id: number, mode: ModeLecture): Observable<any> {
+    return this.http.post(API_URLS.modeLecture(id), { mode });
+  }
+
+  getStats(id: number, periode: string): Observable<StatsResponse> {
+    return this.http.get<StatsResponse>(API_URLS.stats(id, periode));
+  }
+
+  getStatutConfig(id: number): Observable<StatutConfig> {
+    return this.http.get<StatutConfig>(API_URLS.statutConfig(id));
+  }
+
+  addReleveManuel(data: { compteurId: number; valeur: number; commentaire?: string }): Observable<any> {
+    return this.http.post(API_URLS.releveManuel, data);
+  }
+
+  recharger(data: { compteurId: number; montant: number; codeRecharge: string }): Observable<any> {
+    return this.http.post(API_URLS.recharge, data);
+  }
+
+  sauvegarderCompteurId(id: number): void {
+    localStorage.setItem(STORAGE_KEYS.compteurId, id.toString());
+  }
+
+  getCompteurIdSauvegarde(): number | null {
+    const id = localStorage.getItem(STORAGE_KEYS.compteurId);
+    return id ? +id : null;
+  }
+
+  sauvegarderTypeCompteur(type: string): void {
+    localStorage.setItem(STORAGE_KEYS.typeCompteur, type);
+  }
+
+  getTypeCompteurSauvegarde(): string | null {
+    return localStorage.getItem(STORAGE_KEYS.typeCompteur);
+  }
+}

@@ -1,0 +1,160 @@
+<!-- ✅ CRÉÉ — classique.component.html -->
+<app-toast></app-toast>
+
+<div class="app-layout">
+  <app-sidebar></app-sidebar>
+
+  <div class="main-content">
+    <app-header
+      pageTitle="Tableau de bord Classique"
+      pageSubtitle="Suivi de vos index cumulatifs et de votre consommation">
+
+      @if (estManuel && compteur) {
+        <button class="btn btn-primary" (click)="ouvrirModal()">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+          </svg>
+          Ajouter un relevé
+        </button>
+      }
+    </app-header>
+
+    <div class="page-body">
+
+      @if (isLoading) {
+        <app-loading-spinner [size]="48" label="Chargement des données..."></app-loading-spinner>
+      } @else if (!compteur) {
+        <div class="empty-state">
+          <svg width="56" height="56" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+          <p>Aucun compteur configuré.</p>
+        </div>
+      } @else {
+
+        <!-- Ligne 1 : Stats -->
+        <div class="stats-grid">
+
+          <!-- Index actuel -->
+          <div class="card">
+            <p class="stat-label">Index actuel</p>
+            <p class="index-value">
+              {{ compteur.valeurActuelle | number:'1.0-0' }}
+              <span style="font-size:20px;color:var(--color-text-light)"> kWh</span>
+            </p>
+            <p class="stat-sub">Valeur cumulée depuis installation</p>
+
+            @if (dernierReleve) {
+              <div class="index-footer">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--color-text-muted)" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Dernier relevé : {{ dernierReleve.dateTime | date:'dd/MM/yyyy HH:mm' }}
+              </div>
+            }
+          </div>
+
+          <!-- Consommation période -->
+          <div class="card">
+            <p class="stat-label">Consommation estimée</p>
+            <p class="index-value" style="color:var(--color-warning)">
+              {{ consommationEstimee | number:'1.0-0' }}
+              <span style="font-size:20px;color:var(--color-text-light)"> kWh</span>
+            </p>
+            <p class="stat-sub">Différence entre les 2 derniers relevés</p>
+
+            @if (avantDernierReleve) {
+              <div class="index-footer">
+                Relevé précédent : {{ avantDernierReleve.value | number:'1.0-0' }} kWh
+              </div>
+            }
+          </div>
+
+          <!-- Mode lecture -->
+          <div class="card">
+            <div class="stat-icon" style="background:#F3F4F6;margin-bottom:12px">
+              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="var(--color-text-light)" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+            </div>
+            <p class="stat-label">Compteur</p>
+            <p class="stat-value" style="font-size:16px">{{ compteur.reference }}</p>
+            <p class="stat-sub">{{ compteur.adresse }}</p>
+
+            @if (statut) {
+              <div style="margin-top:8px">
+                <span class="badge" [class.badge-success]="statut.moduleConnecte" [class.badge-gray]="!statut.moduleConnecte">
+                  {{ statut.moduleConnecte ? '● En ligne' : '○ Hors ligne' }}
+                </span>
+              </div>
+            }
+          </div>
+
+        </div>
+
+        <!-- Graphique -->
+        <div class="card" style="margin-top:20px">
+          <div class="card-header">
+            <h3>Consommation par jour</h3>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-sm" [class.btn-primary]="periodeStats === 'week'" [class.btn-outline]="periodeStats !== 'week'" (click)="changerPeriode('week')">7 jours</button>
+              <button class="btn btn-sm" [class.btn-primary]="periodeStats === 'month'" [class.btn-outline]="periodeStats !== 'month'" (click)="changerPeriode('month')">30 jours</button>
+            </div>
+          </div>
+          <app-bar-chart [data]="chartData"></app-bar-chart>
+        </div>
+
+      }
+    </div>
+  </div>
+</div>
+
+<!-- MODALE relevé -->
+@if (showModal) {
+  <div class="modal-overlay" (click.self)="fermerModal()">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Saisir un index de compteur</h3>
+        <button class="btn-close" (click)="fermerModal()">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <form [formGroup]="releveForm" (ngSubmit)="ajouterReleve()">
+        <div class="form-group">
+          <label>Index du compteur (kWh cumulé)</label>
+          <input type="number" class="form-control" formControlName="value"
+            [class.is-invalid]="rf['value'].invalid && rf['value'].touched"
+            placeholder="Ex : 12547" step="1" min="0"/>
+          @if (rf['value'].invalid && rf['value'].touched) {
+            <span class="error-msg">Valeur requise (≥ 0).</span>
+          }
+          @if (dernierReleve) {
+            <span class="help-text">Dernier index enregistré : {{ dernierReleve.value | number:'1.0-0' }} kWh</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Commentaire (optionnel)</label>
+          <input type="text" class="form-control" formControlName="comment"
+            placeholder="Ex : Relevé mensuel de janvier"/>
+        </div>
+
+        @if (errorMessage) {
+          <div class="error-box" style="margin-bottom:16px">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#EF4444" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+            {{ errorMessage }}
+          </div>
+        }
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="fermerModal()">Annuler</button>
+          <button type="submit" class="btn btn-primary" [disabled]="isSaving">
+            @if (isSaving) { <span class="btn-spinner"></span> Enregistrement... }
+            @else { Enregistrer }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

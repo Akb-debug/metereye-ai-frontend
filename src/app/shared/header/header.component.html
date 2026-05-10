@@ -1,0 +1,12 @@
+<!-- ✅ CRÉÉ — header.component.html -->
+<header class="page-header">
+  <div class="header-left">
+    <h1 class="page-title">{{ pageTitle() }}</h1>
+    @if (pageSubtitle()) {
+      <p class="page-subtitle">{{ pageSubtitle() }}</p>
+    }
+  </div>
+  <div class="header-right">
+    <ng-content></ng-content>
+  </div>
+</header>

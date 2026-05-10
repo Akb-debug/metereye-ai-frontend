@@ -1,0 +1,91 @@
+<!-- ✅ CRÉÉ — create-compteur.component.html -->
+<app-toast></app-toast>
+
+<div class="auth-page" style="align-items:flex-start;padding-top:48px">
+  <div class="onboarding-card">
+
+    <!-- Stepper 1/2 -->
+    <div class="stepper">
+      <div class="step active">
+        <div class="step-circle">1</div>
+        <span class="step-label">Votre compteur</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step">
+        <div class="step-circle">2</div>
+        <span class="step-label">Mode de lecture</span>
+      </div>
+    </div>
+
+    <h2>Enregistrer votre compteur</h2>
+    <p class="subtitle">Renseignez les informations de votre compteur électrique</p>
+
+    <!-- Type de compteur -->
+    <p style="font-size:13px;font-weight:600;color:var(--color-dark);margin-bottom:10px">Type de compteur</p>
+    <div class="option-cards" style="grid-template-columns:1fr 1fr;margin-bottom:24px">
+
+      <div class="option-card" [class.selected]="typeSelectionne === 'CASH_POWER'" (click)="selectType('CASH_POWER')">
+        <div class="option-icon" style="background:#E8F0FE">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#1A73E8" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <div class="option-title">Cash Power</div>
+        <div class="option-desc">Prépayé — Crédit en kWh, coupure si crédit = 0</div>
+      </div>
+
+      <div class="option-card" [class.selected]="typeSelectionne === 'CLASSIQUE'" (click)="selectType('CLASSIQUE')">
+        <div class="option-icon" style="background:#FEF3C7">
+          <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="#F59E0B" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+        </div>
+        <div class="option-title">Classique</div>
+        <div class="option-desc">Postpayé — Index cumulatif, facture mensuelle</div>
+      </div>
+
+    </div>
+
+    <!-- Formulaire -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+      <div class="form-group">
+        <label>Numéro de référence du compteur</label>
+        <input type="text" class="form-control" formControlName="reference"
+          [class.is-invalid]="f['reference'].invalid && f['reference'].touched"
+          placeholder="Ex : CP-2024-001234"/>
+        @if (f['reference'].invalid && f['reference'].touched) {
+          <span class="error-msg">Référence requise (min. 4 caractères).</span>
+        }
+        <span class="help-text">Inscrit sur votre compteur ou votre facture.</span>
+      </div>
+
+      <div class="form-group">
+        <label>Adresse d'installation</label>
+        <input type="text" class="form-control" formControlName="adresse"
+          [class.is-invalid]="f['adresse'].invalid && f['adresse'].touched"
+          placeholder="Ex : Quartier Bè, Rue 123, Lomé"/>
+        @if (f['adresse'].invalid && f['adresse'].touched) {
+          <span class="error-msg">Adresse requise (min. 5 caractères).</span>
+        }
+      </div>
+
+      @if (errorMessage) {
+        <div class="error-box" style="margin-bottom:16px">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#EF4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+          {{ errorMessage }}
+        </div>
+      }
+
+      <button type="submit" class="btn btn-primary btn-full" [disabled]="isLoading">
+        @if (isLoading) {
+          <span class="btn-spinner"></span> Enregistrement...
+        } @else {
+          Continuer
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+        }
+      </button>
+    </form>
+
+  </div>
+</div>

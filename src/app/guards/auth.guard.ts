@@ -1,26 +1,40 @@
-// Rôle : Protège les routes privées de l'application (ex: /dashboard).
-// Redirige les utilisateurs non connectés vers la page de connexion.
+// 🔄 MODIFIÉ — auth.guard.ts — ajouts : redirection smart selon typeCompteur
 
 import { CanActivateFn } from '@angular/router';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { STORAGE_KEYS } from '../config/app.config.api';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const authGuard: CanActivateFn = (_route, state) => {
+
+  const authService = inject(AuthService);
+  const router      = inject(Router);
+
+  if (!authService.isLoggedIn()) {
+    router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
+    return false;
+  }
+
+  return true;
+};
+
+export const redirectIfLoggedInGuard: CanActivateFn = () => {
 
   const authService = inject(AuthService);
   const router      = inject(Router);
 
   if (authService.isLoggedIn()) {
-    // Utilisateur connecté → accès autorisé
-    return true;
+    const type = localStorage.getItem(STORAGE_KEYS.typeCompteur);
+    if (type === 'CASH_POWER') {
+      router.navigate(['/dashboard/cashpower']);
+    } else if (type === 'CLASSIQUE') {
+      router.navigate(['/dashboard/classique']);
+    } else {
+      router.navigate(['/onboarding/compteur']);
+    }
+    return false;
   }
 
-  // Non connecté → rediriger vers /login
-  // On sauvegarde l'URL demandée pour y revenir potentiellement après connexion
-  router.navigate(['/login'], {
-    queryParams: { returnUrl: state.url }
-  });
-
-  return false;
+  return true;
 };
