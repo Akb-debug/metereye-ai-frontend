@@ -23,8 +23,8 @@ export class CompteurService {
     return this.http.get<CompteurResponse>(API_URLS.compteur(id));
   }
 
-  setModeLecture(id: number, mode: ModeLecture): Observable<any> {
-    return this.http.post(API_URLS.modeLecture(id), { mode });
+  setModeLecture(id: number, mode: ModeLecture, commentaire?: string): Observable<any> {
+    return this.http.post(API_URLS.modeLecture(id), { modeLecture: mode, commentaire });
   }
 
   getStats(id: number, periode: string): Observable<StatsResponse> {
