@@ -1,12 +1,15 @@
+// 🔄 MODIFIÉ — config-esp32.component.ts — corrections: Bluetooth remplacé par DeviceService (QR code)
+
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { BluetoothService } from '../../../services/bluetooth.service';
+import { DeviceService } from '../../../services/device.service';
 import { CompteurService } from '../../../services/compteur.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { ToastComponent } from '../../../shared/toast/toast.component';
+import { DeviceResponse } from '../../../models/device.model';
 import { STORAGE_KEYS } from '../../../config/app.config.api';
 
 @Component({
@@ -18,34 +21,42 @@ import { STORAGE_KEYS } from '../../../config/app.config.api';
 })
 export class ConfigEsp32Component implements OnInit {
 
-  private fb               = inject(FormBuilder);
-  private bluetoothService = inject(BluetoothService);
-  private compteurService  = inject(CompteurService);
-  private authService      = inject(AuthService);
-  private router           = inject(Router);
-  private toast            = inject(ToastService);
+  private fb              = inject(FormBuilder);
+  private deviceService   = inject(DeviceService);
+  private compteurService = inject(CompteurService);
+  private authService     = inject(AuthService);
+  private router          = inject(Router);
+  private toast           = inject(ToastService);
 
-  scanForm!:    FormGroup;
-  wifiForm!:    FormGroup;
-  isScanning    = false;
-  isConfiguring = false;
-  scanReussi    = false;
-  errorMessage  = '';
+  scanForm!:          FormGroup;
+  associationForm!:   FormGroup;
+  isScanning          = false;
+  isAssociating       = false;
+  deviceScanne?:      DeviceResponse;
+  showAssociationForm = false;
+  errorMessage        = '';
+
+  intervalOptions = [
+    { value: 900,  label: '15 minutes' },
+    { value: 1800, label: '30 minutes' },
+    { value: 3600, label: '1 heure' },
+    { value: 7200, label: '2 heures' },
+  ];
 
   get nomComplet(): string { return this.authService.getNomComplet(); }
 
   ngOnInit(): void {
     this.scanForm = this.fb.group({
-      adresseBluetooth: ['', [Validators.required, Validators.minLength(3)]]
+      deviceCode:   ['', [Validators.required, Validators.minLength(3)]],
+      serialNumber: ['', [Validators.required, Validators.minLength(3)]],
+      qrCodeValue:  ['']
     });
-    this.wifiForm = this.fb.group({
-      ssid:           ['', Validators.required],
-      motDePasseWifi: ['', [Validators.required, Validators.minLength(8)]]
+    this.associationForm = this.fb.group({
+      captureInterval: [3600, Validators.required]
     });
   }
 
   get sf() { return this.scanForm.controls; }
-  get wf() { return this.wifiForm.controls; }
 
   scanner(): void {
     if (this.scanForm.invalid) { this.scanForm.markAllAsTouched(); return; }
@@ -55,10 +66,15 @@ export class ConfigEsp32Component implements OnInit {
     this.isScanning   = true;
     this.errorMessage = '';
 
-    this.bluetoothService.scanModule({ adresseBluetooth: this.scanForm.value.adresseBluetooth, compteurId }).subscribe({
-      next: () => {
-        this.isScanning = false;
-        this.scanReussi = true;
+    this.deviceService.scanDevice({
+      deviceCode:   this.scanForm.value.deviceCode,
+      serialNumber: this.scanForm.value.serialNumber,
+      qrCodeValue:  this.scanForm.value.qrCodeValue ?? ''
+    }).subscribe({
+      next: (device) => {
+        this.deviceScanne       = device;
+        this.showAssociationForm = true;
+        this.isScanning         = false;
         this.toast.success('Module ESP32-CAM détecté !');
       },
       error: (err: Error) => {
@@ -68,28 +84,25 @@ export class ConfigEsp32Component implements OnInit {
     });
   }
 
-  configurer(): void {
-    if (this.wifiForm.invalid) { this.wifiForm.markAllAsTouched(); return; }
+  associer(): void {
     const compteurId = this.compteurService.getCompteurIdSauvegarde();
-    if (!compteurId) { this.toast.error('Compteur introuvable.'); return; }
+    if (!compteurId || !this.deviceScanne) return;
 
-    this.isConfiguring = true;
+    this.isAssociating = true;
     this.errorMessage  = '';
 
-    this.bluetoothService.configureModule({
-      adresseBluetooth: this.scanForm.value.adresseBluetooth,
-      ssid:             this.wifiForm.value.ssid,
-      motDePasseWifi:   this.wifiForm.value.motDePasseWifi,
-      compteurId
+    this.deviceService.associerDevice(this.deviceScanne.deviceCode, {
+      compteurId,
+      captureInterval: this.associationForm.value.captureInterval
     }).subscribe({
       next: () => {
-        this.isConfiguring = false;
-        this.toast.success('Module ESP32-CAM configuré avec succès !');
+        this.isAssociating = false;
+        this.toast.success('Module ESP32-CAM associé avec succès !');
         this.redirectDashboard();
       },
       error: (err: Error) => {
         this.errorMessage  = err.message;
-        this.isConfiguring = false;
+        this.isAssociating = false;
       }
     });
   }

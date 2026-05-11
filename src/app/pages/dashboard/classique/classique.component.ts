@@ -15,7 +15,7 @@ import { CompteurService } from '../../../services/compteur.service';
 import { ReadingService } from '../../../services/reading.service';
 import { ToastService } from '../../../services/toast.service';
 
-import { CompteurResponse, StatutConfig } from '../../../models/compteur.model';
+import { CompteurResponse, StatutConfig, StatsResponse } from '../../../models/compteur.model';
 import { ReadingResponse } from '../../../models/reading.model';
 
 @Component({
@@ -36,11 +36,12 @@ export class ClassiqueComponent implements OnInit, OnDestroy {
   private toast           = inject(ToastService);
   private fb              = inject(FormBuilder);
 
-  compteur?:      CompteurResponse;
-  statut?:        StatutConfig;
-  dernierReleve?:  ReadingResponse;
+  compteur?:           CompteurResponse;
+  statut?:             StatutConfig;
+  dernierReleve?:      ReadingResponse;
   avantDernierReleve?: ReadingResponse;
-  chartData:      BarChartData = { labels: [], values: [], color: '#F59E0B', unit: ' kWh' };
+  statsPeriode?:       StatsResponse;
+  chartData:           BarChartData = { labels: [], values: [], color: '#F59E0B', unit: ' kWh' };
 
   isLoading    = true;
   showModal    = false;
@@ -103,7 +104,13 @@ export class ClassiqueComponent implements OnInit, OnDestroy {
   private chargerStats(id: number): void {
     this.compteurService.getStats(id, this.periodeStats).subscribe({
       next: (s) => {
-        this.chartData = { labels: s.labels, values: s.consommations, color: '#F59E0B', unit: ' kWh' };
+        this.statsPeriode = s;
+        this.chartData = {
+          labels: ['Min', 'Moyenne', 'Max'],
+          values: [s.consommationMin, s.consommationMoyenne, s.consommationMax],
+          color: '#F59E0B',
+          unit: ' kWh'
+        };
       },
       error: () => {}
     });
@@ -150,8 +157,7 @@ export class ClassiqueComponent implements OnInit, OnDestroy {
     this.readingService.createReleveManuel({
       meterId: id,
       value:   +this.releveForm.value.value,
-      comment: this.releveForm.value.comment ?? '',
-      source:  'MANUAL'
+      date:    new Date().toISOString()
     }).subscribe({
       next: () => {
         this.toast.success('Relevé enregistré !');

@@ -69,10 +69,11 @@ export class HistoriqueComponent implements OnInit {
 
     this.readingService.getReleves(id, this.currentPage, this.pageSize, source).subscribe({
       next: (p: PagedReadings) => {
-        this.releves      = p.content;
-        this.totalElements = p.totalElements;
-        this.totalPages   = p.totalPages;
-        this.isLoading    = false;
+        this.releves       = p.content;
+        this.totalElements = p.pageable?.totalElements ?? p.totalElements ?? 0;
+        this.totalPages    = p.pageable?.totalPages    ?? p.totalPages    ?? 0;
+        this.currentPage   = p.pageable?.page          ?? this.currentPage;
+        this.isLoading     = false;
       },
       error: () => { this.isLoading = false; }
     });

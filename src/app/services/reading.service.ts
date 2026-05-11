@@ -1,4 +1,4 @@
-// ✅ CRÉÉ — reading.service.ts
+// 🔄 MODIFIÉ — reading.service.ts — corrections: CreateReadingRequest avec date ISO, suppression comment/source
 
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -18,7 +18,7 @@ export class ReadingService {
   getReleves(
     meterId: number,
     page: number = 0,
-    size: number = 10,
+    size: number = 20,
     source?: string
   ): Observable<PagedReadings> {
     let params = new HttpParams()

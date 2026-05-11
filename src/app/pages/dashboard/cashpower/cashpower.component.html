@@ -92,7 +92,7 @@
               <span class="stat-label">Dernier relevé</span>
               @if (dernierReleve) {
                 <span class="stat-value" style="font-size:18px">{{ dernierReleve.value | number:'1.1-1' }} kWh</span>
-                <span class="stat-sub">{{ dernierReleve.dateTime | date:'dd/MM/yyyy HH:mm' }}</span>
+                <span class="stat-sub">{{ dernierReleve.date | date:'dd/MM/yyyy HH:mm' }}</span>
               } @else {
                 <span class="stat-value" style="font-size:16px;color:var(--color-text-muted)">Aucun relevé</span>
               }
@@ -114,8 +114,8 @@
                 @else if (statut.modeLectureConfigure === 'SENSOR') { PZEM-004T }
                 @else { Non configuré }
               </span>
-              <span class="badge" [class.badge-success]="statut.moduleConnecte" [class.badge-gray]="!statut.moduleConnecte">
-                {{ statut.moduleConnecte ? 'Module connecté' : 'Module déconnecté' }}
+              <span class="badge" [class.badge-success]="statut.configurePourLecture" [class.badge-gray]="!statut.configurePourLecture">
+                {{ statut.configurePourLecture ? 'Module configuré' : 'Non configuré' }}
               </span>
             } @else {
               <span class="stat-value" style="font-size:14px;color:var(--color-text-muted)">Chargement...</span>

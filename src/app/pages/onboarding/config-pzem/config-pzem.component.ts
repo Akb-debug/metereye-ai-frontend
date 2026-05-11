@@ -1,12 +1,15 @@
+// 🔄 MODIFIÉ — config-pzem.component.ts — corrections: Bluetooth remplacé par DeviceService (QR code)
+
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { BluetoothService } from '../../../services/bluetooth.service';
+import { DeviceService } from '../../../services/device.service';
 import { CompteurService } from '../../../services/compteur.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastService } from '../../../services/toast.service';
 import { ToastComponent } from '../../../shared/toast/toast.component';
+import { DeviceResponse } from '../../../models/device.model';
 import { STORAGE_KEYS } from '../../../config/app.config.api';
 
 @Component({
@@ -18,48 +21,60 @@ import { STORAGE_KEYS } from '../../../config/app.config.api';
 })
 export class ConfigPzemComponent implements OnInit {
 
-  private fb               = inject(FormBuilder);
-  private bluetoothService = inject(BluetoothService);
-  private compteurService  = inject(CompteurService);
-  private authService      = inject(AuthService);
-  private router           = inject(Router);
-  private toast            = inject(ToastService);
+  private fb              = inject(FormBuilder);
+  private deviceService   = inject(DeviceService);
+  private compteurService = inject(CompteurService);
+  private authService     = inject(AuthService);
+  private router          = inject(Router);
+  private toast           = inject(ToastService);
 
-  form!:           FormGroup;
-  isScanning       = false;
-  isConfiguring    = false;
-  scanReussi       = false;
-  accordeonOuvert  = false;
-  errorMessage     = '';
+  scanForm!:          FormGroup;
+  associationForm!:   FormGroup;
+  isScanning          = false;
+  isAssociating       = false;
+  deviceScanne?:      DeviceResponse;
+  showAssociationForm = false;
+  errorMessage        = '';
+
+  intervalOptions = [
+    { value: 60,   label: '1 minute' },
+    { value: 300,  label: '5 minutes' },
+    { value: 900,  label: '15 minutes' },
+    { value: 1800, label: '30 minutes' },
+  ];
 
   get nomComplet(): string { return this.authService.getNomComplet(); }
 
   ngOnInit(): void {
-    this.form = this.fb.group({
-      adresseBluetooth: ['', [Validators.required, Validators.minLength(3)]],
-      ssid:             ['', Validators.required],
-      motDePasseWifi:   ['', [Validators.required, Validators.minLength(8)]],
-      tensionNominale:  [220],
-      courantMax:       [63]
+    this.scanForm = this.fb.group({
+      deviceCode:   ['', [Validators.required, Validators.minLength(3)]],
+      serialNumber: ['', [Validators.required, Validators.minLength(3)]],
+      qrCodeValue:  ['']
+    });
+    this.associationForm = this.fb.group({
+      captureInterval: [300, Validators.required]
     });
   }
 
-  get f() { return this.form.controls; }
+  get sf() { return this.scanForm.controls; }
 
   scanner(): void {
-    if (this.form.get('adresseBluetooth')?.invalid) {
-      this.form.get('adresseBluetooth')?.markAsTouched(); return;
-    }
+    if (this.scanForm.invalid) { this.scanForm.markAllAsTouched(); return; }
     const compteurId = this.compteurService.getCompteurIdSauvegarde();
     if (!compteurId) { this.toast.error('Compteur introuvable.'); return; }
 
     this.isScanning   = true;
     this.errorMessage = '';
 
-    this.bluetoothService.scanModule({ adresseBluetooth: this.form.value.adresseBluetooth, compteurId }).subscribe({
-      next: () => {
-        this.isScanning = false;
-        this.scanReussi = true;
+    this.deviceService.scanDevice({
+      deviceCode:   this.scanForm.value.deviceCode,
+      serialNumber: this.scanForm.value.serialNumber,
+      qrCodeValue:  this.scanForm.value.qrCodeValue ?? ''
+    }).subscribe({
+      next: (device) => {
+        this.deviceScanne        = device;
+        this.showAssociationForm = true;
+        this.isScanning          = false;
         this.toast.success('Module PZEM-004T détecté !');
       },
       error: (err: Error) => {
@@ -69,39 +84,35 @@ export class ConfigPzemComponent implements OnInit {
     });
   }
 
-  configurer(): void {
-    const required = ['adresseBluetooth', 'ssid', 'motDePasseWifi'];
-    required.forEach(k => this.form.get(k)?.markAsTouched());
-    if (required.some(k => this.form.get(k)?.invalid)) return;
-
+  associer(): void {
     const compteurId = this.compteurService.getCompteurIdSauvegarde();
-    if (!compteurId) { this.toast.error('Compteur introuvable.'); return; }
+    if (!compteurId || !this.deviceScanne) return;
 
-    this.isConfiguring = true;
+    this.isAssociating = true;
     this.errorMessage  = '';
 
-    this.bluetoothService.directConfigure({
-      adresseBluetooth: this.form.value.adresseBluetooth,
-      ssid:             this.form.value.ssid,
-      motDePasseWifi:   this.form.value.motDePasseWifi,
+    this.deviceService.associerDevice(this.deviceScanne.deviceCode, {
       compteurId,
-      tensionNominale:  this.form.value.tensionNominale,
-      courantMax:       this.form.value.courantMax
+      captureInterval: this.associationForm.value.captureInterval
     }).subscribe({
       next: () => {
-        this.isConfiguring = false;
-        this.toast.success('Module PZEM-004T configuré avec succès !');
-        const type = localStorage.getItem(STORAGE_KEYS.typeCompteur);
-        this.router.navigate(
-          type === 'CASH_POWER' ? ['/dashboard/cashpower'] : ['/dashboard/classique']
-        );
+        this.isAssociating = false;
+        this.toast.success('Module PZEM-004T associé avec succès !');
+        this.redirectDashboard();
       },
       error: (err: Error) => {
         this.errorMessage  = err.message;
-        this.isConfiguring = false;
+        this.isAssociating = false;
       }
     });
   }
 
   seDeconnecter(): void { this.authService.logout(); }
+
+  private redirectDashboard(): void {
+    const type = localStorage.getItem(STORAGE_KEYS.typeCompteur);
+    this.router.navigate(
+      type === 'CASH_POWER' ? ['/dashboard/cashpower'] : ['/dashboard/classique']
+    );
+  }
 }

@@ -1,35 +1,28 @@
-// ✅ CRÉÉ — alerte.model.ts
+// 🔄 MODIFIÉ — alerte.model.ts — corrections: type au lieu de typeAlerte, compteur objet imbriqué
 
 export type TypeAlerte =
+  | 'SEUIL_CREDIT'
   | 'NOUVEAU_RELEVE'
-  | 'CREDIT_FAIBLE'
-  | 'COUPURE_IMMINENTE'
   | 'ANOMALIE_CONSOMMATION'
   | 'RAPPORT_DISPONIBLE'
-  | 'CONNEXION_UTILISATEUR'
+  | 'COUPURE_IMMINENTE'
   | 'APPAREIL_HORS_LIGNE'
   | 'APPAREIL_RECONNECTE';
 
 export interface AlerteResponse {
-  id:                 number;
-  typeAlerte:         TypeAlerte;
-  message:            string;
-  lue:                boolean;
-  dateCreation:       string;
-  compteurId:         number;
-  compteurReference:  string;
+  id:           number;
+  type:         string;
+  message:      string;
+  lue:          boolean;
+  dateCreation: string;
+  compteur?:    { id: number; reference: string };
 }
 
 export interface NotificationResponse {
-  id:          number;
-  titre:       string;
-  contenu:     string;
-  lue:         boolean;
+  id:           number;
+  titre:        string;
+  message:      string;
   dateCreation: string;
-}
-
-export interface NotificationPreferences {
-  push:  boolean;
-  sms:   boolean;
-  email: boolean;
+  type:         string;
+  lue:          boolean;
 }

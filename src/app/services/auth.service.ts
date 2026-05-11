@@ -1,4 +1,4 @@
-// 🔄 MODIFIÉ — auth.service.ts — fix: auto-login après inscription (register ne retourne pas de token)
+// 🔄 MODIFIÉ — auth.service.ts — corrections: sauvegarderSession lit nomComplet/userId, register enchaîne login
 
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -32,8 +32,6 @@ export class AuthService {
   }
 
   register(request: RegisterRequest): Observable<AuthResponse> {
-    // POST /api/auth/register crée l'utilisateur sans retourner de token.
-    // On enchaîne automatiquement un login() pour obtenir le token JWT.
     return this.http.post<any>(API_URLS.register, request).pipe(
       switchMap(() =>
         this.login({ email: request.email, motDePasse: request.motDePasse })
@@ -69,8 +67,7 @@ export class AuthService {
   }
 
   getNomComplet(): string {
-    const nom = localStorage.getItem(STORAGE_KEYS.nomComplet);
-    return nom ?? 'Utilisateur';
+    return localStorage.getItem(STORAGE_KEYS.nomComplet) ?? 'Utilisateur';
   }
 
   getCurrentUserState(): UserState {
@@ -80,8 +77,8 @@ export class AuthService {
   private sauvegarderSession(r: AuthResponse): void {
     localStorage.setItem(STORAGE_KEYS.token,      r.token ?? '');
     localStorage.setItem(STORAGE_KEYS.role,       r.role  ?? '');
-    localStorage.setItem(STORAGE_KEYS.nomComplet, `${r.prenom ?? ''} ${r.nom ?? ''}`.trim());
-    localStorage.setItem(STORAGE_KEYS.userId,     (r.id ?? 0).toString());
+    localStorage.setItem(STORAGE_KEYS.nomComplet, r.nomComplet ?? '');
+    localStorage.setItem(STORAGE_KEYS.userId,     String(r.userId ?? 0));
 
     this.userStateSubject.next({ isLoggedIn: true, user: r });
   }
@@ -95,12 +92,9 @@ export class AuthService {
         isLoggedIn: true,
         user: {
           token,
-          type:   'Bearer',
-          id:     +(localStorage.getItem(STORAGE_KEYS.userId) ?? 0),
-          email:  '',
           role,
-          nom:    '',
-          prenom: localStorage.getItem(STORAGE_KEYS.nomComplet) ?? ''
+          nomComplet: localStorage.getItem(STORAGE_KEYS.nomComplet) ?? '',
+          userId:     +(localStorage.getItem(STORAGE_KEYS.userId) ?? 0)
         }
       });
     }

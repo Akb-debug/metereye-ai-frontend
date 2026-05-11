@@ -1,37 +1,39 @@
-// ✅ CRÉÉ — compteur.model.ts
+// 🔄 MODIFIÉ — compteur.model.ts — corrections: CompteurResponse statut+index, StatutConfig aligné backend, StatsResponse champs réels
 
 export interface CompteurRequest {
-  reference:     string;
-  adresse:       string;
-  typeCompteur:  'CLASSIQUE' | 'CASH_POWER';
+  reference:      string;
+  adresse:        string;
+  typeCompteur:   'CLASSIQUE' | 'CASH_POWER';
   valeurInitiale: number;
 }
 
 export interface CompteurResponse {
-  id:                   number;
-  reference:            string;
-  adresse:              string;
-  typeCompteur:         'CLASSIQUE' | 'CASH_POWER';
-  valeurActuelle:       number;
-  proprietaireNom:      string;
-  proprietaireId:       number;
-  dateInitialisation:   string;
-  actif:                boolean;
-  dateCreation:         string;
+  id:                    number;
+  reference:             string;
+  adresse:               string;
+  typeCompteur:          'CLASSIQUE' | 'CASH_POWER';
+  statut:                string;
+  valeurActuelle:        number;
+  indexInitial?:         number;
+  indexPrecedent?:       number;
+  modeLectureConfigure?: string;
+  dateCreation:          string;
 }
 
 export interface StatutConfig {
-  compteurId:            number;
-  modeLectureConfigure:  'MANUAL' | 'ESP32_CAM' | 'SENSOR' | null;
-  moduleConnecte:        boolean;
-  dernierReleve:         string | null;
+  reference:              string;
+  statut:                 string;
+  modeLectureConfigure:   string;
+  configurePourLecture:   boolean;
 }
 
 export interface StatsResponse {
-  labels:        string[];
-  consommations: number[];
-  total:         number;
-  moyenne:       number;
+  periode:               string;
+  consommationTotale:    number;
+  consommationMoyenne:   number;
+  consommationMax:       number;
+  consommationMin:       number;
+  nombreReleves:         number;
 }
 
 export type ModeLecture = 'MANUAL' | 'ESP32_CAM' | 'SENSOR';

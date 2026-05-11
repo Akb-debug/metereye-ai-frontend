@@ -94,7 +94,7 @@ export const authInterceptor: HttpInterceptorFn = (
         });
 
         // Rediriger vers la page de connexion
-        router.navigate(['/login'], {
+        router.navigate(['/auth/login'], {
           queryParams: { reason: 'session_expiree' }
         });
       }

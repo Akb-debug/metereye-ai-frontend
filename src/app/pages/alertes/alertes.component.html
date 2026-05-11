@@ -47,14 +47,16 @@
           <div class="alerte-list">
             @for (alerte of alertes; track alerte.id) {
               <div class="alerte-item" [class.unread]="!alerte.lue" (click)="marquerLue(alerte)">
-                <div class="alerte-dot" [class]="'dot-' + alerteIcon(alerte.typeAlerte)"></div>
+                <div class="alerte-dot" [class]="'dot-' + alerteIcon(alerte.type)"></div>
                 <div class="alerte-body">
                   <div class="alerte-top">
                     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-                      <span class="badge" [class]="'badge-' + alerteIcon(alerte.typeAlerte)" style="font-size:11px">
-                        {{ alerteLabel(alerte.typeAlerte) }}
+                      <span class="badge" [class]="'badge-' + alerteIcon(alerte.type)" style="font-size:11px">
+                        {{ alerteLabel(alerte.type) }}
                       </span>
-                      <span class="alerte-ref">{{ alerte.compteurReference }}</span>
+                      @if (alerte.compteur?.reference) {
+                        <span class="alerte-ref">{{ alerte.compteur!.reference }}</span>
+                      }
                     </div>
                     <div class="alerte-date">{{ alerte.dateCreation | date:'dd/MM/yyyy HH:mm' }}</div>
                   </div>
@@ -90,7 +92,7 @@
                     <span style="font-weight:600;color:var(--color-dark)">{{ n.titre }}</span>
                     <div class="alerte-date">{{ n.dateCreation | date:'dd/MM/yyyy HH:mm' }}</div>
                   </div>
-                  <p class="alerte-message">{{ n.contenu }}</p>
+                  <p class="alerte-message">{{ n.message }}</p>
                 </div>
               </div>
             }

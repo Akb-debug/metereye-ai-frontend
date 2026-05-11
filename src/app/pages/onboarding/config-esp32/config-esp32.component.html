@@ -46,61 +46,82 @@
   <div class="onb-card">
 
     <h2 class="onb-title">Configuration ESP32-CAM</h2>
-    <p class="onb-subtitle">Scannez votre module via Bluetooth puis configurez le Wi-Fi.</p>
+    <p class="onb-subtitle">Scannez votre module via son code ou QR code, puis associez-le à votre compteur.</p>
 
-    <!-- Étape 1 : Scan Bluetooth -->
+    <!-- Étape 1 : Scan du device -->
     <div class="config-section">
       <div class="section-header">
-        <div class="section-num" [class.done]="scanReussi">
-          @if (scanReussi) {
+        <div class="section-num" [class.done]="showAssociationForm">
+          @if (showAssociationForm) {
             <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
           } @else { 1 }
         </div>
-        <span>Connexion Bluetooth</span>
-        @if (scanReussi) { <span class="badge badge-success">Connecté</span> }
+        <span>Identification du module</span>
+        @if (showAssociationForm) { <span class="badge badge-success">Détecté</span> }
       </div>
 
-      <div class="form-group" style="margin-bottom:0">
-        <label>Adresse Bluetooth du module</label>
-        <div class="input-row">
-          <input type="text" class="form-control" [formControl]="$any(scanForm.get('adresseBluetooth'))"
-            [class.is-invalid]="sf['adresseBluetooth'].invalid && sf['adresseBluetooth'].touched"
-            placeholder="Ex : ESP32-CAM-001 ou AA:BB:CC:DD:EE:FF"
-            [readonly]="scanReussi"/>
-          <button class="btn btn-outline-primary" (click)="scanner()" [disabled]="isScanning || scanReussi">
+      <form [formGroup]="scanForm">
+        <div class="form-group">
+          <label>Code du module ESP32-CAM</label>
+          <input type="text" class="form-control" formControlName="deviceCode"
+            [class.is-invalid]="sf['deviceCode'].invalid && sf['deviceCode'].touched"
+            placeholder="Ex : ESP32-001"
+            [readonly]="showAssociationForm"/>
+          @if (sf['deviceCode'].invalid && sf['deviceCode'].touched) {
+            <span class="error-msg">Le code du module est requis.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Numéro de série</label>
+          <input type="text" class="form-control" formControlName="serialNumber"
+            [class.is-invalid]="sf['serialNumber'].invalid && sf['serialNumber'].touched"
+            placeholder="Ex : SN-2024-001"
+            [readonly]="showAssociationForm"/>
+          @if (sf['serialNumber'].invalid && sf['serialNumber'].touched) {
+            <span class="error-msg">Le numéro de série est requis.</span>
+          }
+        </div>
+
+        <div class="form-group" style="margin-bottom:0">
+          <label>Valeur QR code (optionnel)</label>
+          <input type="text" class="form-control" formControlName="qrCodeValue"
+            placeholder="Valeur scannée depuis le QR code"
+            [readonly]="showAssociationForm"/>
+        </div>
+      </form>
+
+      @if (!showAssociationForm) {
+        <div style="margin-top:16px">
+          <button class="btn btn-outline-primary" (click)="scanner()" [disabled]="isScanning">
             @if (isScanning) { <span class="btn-spinner"></span> }
-            {{ isScanning ? 'Scan...' : 'Scanner' }}
+            {{ isScanning ? 'Détection...' : 'Détecter le module' }}
           </button>
         </div>
-      </div>
+      }
     </div>
 
-    <!-- Étape 2 : Configuration Wi-Fi -->
-    @if (scanReussi) {
+    <!-- Étape 2 : Association -->
+    @if (showAssociationForm && deviceScanne) {
       <div class="config-section">
         <div class="section-header">
           <div class="section-num">2</div>
-          <span>Configuration Wi-Fi</span>
+          <span>Association au compteur</span>
         </div>
 
-        <form [formGroup]="wifiForm">
-          <div class="form-group">
-            <label>Nom du réseau Wi-Fi (SSID)</label>
-            <input type="text" class="form-control" formControlName="ssid"
-              [class.is-invalid]="wf['ssid'].invalid && wf['ssid'].touched"
-              placeholder="Mon_WiFi"/>
-            @if (wf['ssid'].invalid && wf['ssid'].touched) {
-              <span class="error-msg">Le nom du réseau est requis.</span>
-            }
-          </div>
+        <div class="device-info" style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;padding:12px 16px;margin-bottom:16px">
+          <p style="font-weight:600;color:#166534;margin:0 0 4px">Module détecté : {{ deviceScanne.deviceCode }}</p>
+          <p style="font-size:13px;color:#15803D;margin:0">Statut : {{ deviceScanne.statut }}</p>
+        </div>
+
+        <form [formGroup]="associationForm">
           <div class="form-group" style="margin-bottom:0">
-            <label>Mot de passe Wi-Fi</label>
-            <input type="password" class="form-control" formControlName="motDePasseWifi"
-              [class.is-invalid]="wf['motDePasseWifi'].invalid && wf['motDePasseWifi'].touched"
-              placeholder="Minimum 8 caractères"/>
-            @if (wf['motDePasseWifi'].invalid && wf['motDePasseWifi'].touched) {
-              <span class="error-msg">Minimum 8 caractères.</span>
-            }
+            <label>Intervalle de capture</label>
+            <select class="form-control" formControlName="captureInterval">
+              @for (opt of intervalOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
           </div>
         </form>
       </div>
@@ -115,9 +136,9 @@
 
     <div class="onb-actions">
       <button type="button" class="onb-btn-back" routerLink="/onboarding/mode-lecture">← Retour</button>
-      @if (scanReussi) {
-        <button class="btn btn-primary" (click)="configurer()" [disabled]="isConfiguring">
-          @if (isConfiguring) { <span class="btn-spinner"></span> Configuration... }
+      @if (showAssociationForm) {
+        <button class="btn btn-primary" (click)="associer()" [disabled]="isAssociating">
+          @if (isAssociating) { <span class="btn-spinner"></span> Association... }
           @else { Terminer la configuration → }
         </button>
       }

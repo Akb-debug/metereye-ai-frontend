@@ -15,7 +15,7 @@ import { CompteurService } from '../../../services/compteur.service';
 import { ReadingService } from '../../../services/reading.service';
 import { ToastService } from '../../../services/toast.service';
 
-import { CompteurResponse, StatutConfig } from '../../../models/compteur.model';
+import { CompteurResponse, StatutConfig, StatsResponse } from '../../../models/compteur.model';
 import { ReadingResponse } from '../../../models/reading.model';
 
 @Component({
@@ -36,10 +36,11 @@ export class CashpowerComponent implements OnInit, OnDestroy {
   private toast           = inject(ToastService);
   private fb              = inject(FormBuilder);
 
-  compteur?:     CompteurResponse;
-  statut?:       StatutConfig;
+  compteur?:      CompteurResponse;
+  statut?:        StatutConfig;
   dernierReleve?: ReadingResponse;
-  chartData:     BarChartData = { labels: [], values: [], color: '#1A73E8', unit: ' kWh' };
+  statsPeriode?:  StatsResponse;
+  chartData:      BarChartData = { labels: [], values: [], color: '#1A73E8', unit: ' kWh' };
 
   isLoading      = true;
   showModal      = false;
@@ -102,7 +103,13 @@ export class CashpowerComponent implements OnInit, OnDestroy {
   private chargerStats(id: number): void {
     this.compteurService.getStats(id, this.periodeStats).subscribe({
       next: (s) => {
-        this.chartData = { labels: s.labels, values: s.consommations, color: '#1A73E8', unit: ' kWh' };
+        this.chartData = {
+          labels: ['Min', 'Moyenne', 'Max'],
+          values: [s.consommationMin, s.consommationMoyenne, s.consommationMax],
+          color: '#1A73E8',
+          unit: ' kWh'
+        };
+        this.statsPeriode = s;
       },
       error: () => {}
     });
@@ -116,8 +123,9 @@ export class CashpowerComponent implements OnInit, OnDestroy {
   }
 
   get creditPct(): number {
-    if (!this.compteur) return 0;
-    return Math.min(100, Math.max(0, (this.compteur.valeurActuelle / 100) * 100));
+    if (!this.compteur || !this.statsPeriode) return this.compteur ? Math.min(100, this.compteur.valeurActuelle) : 0;
+    const initial = this.compteur.indexInitial ?? 10000;
+    return Math.min(100, Math.max(0, (this.compteur.valeurActuelle / initial) * 100));
   }
 
   get creditColor(): string {
@@ -153,8 +161,7 @@ export class CashpowerComponent implements OnInit, OnDestroy {
     this.readingService.createReleveManuel({
       meterId: id,
       value:   +this.releveForm.value.value,
-      comment: this.releveForm.value.comment ?? '',
-      source:  'MANUAL'
+      date:    new Date().toISOString()
     }).subscribe({
       next: () => {
         this.toast.success('Relevé enregistré !');

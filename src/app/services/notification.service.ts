@@ -1,9 +1,10 @@
-// ✅ CRÉÉ — notification.service.ts
+// 🔄 MODIFIÉ — notification.service.ts — corrections: NotificationPreferences champs backend (pushEnabled etc.)
 
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { NotificationResponse, NotificationPreferences } from '../models/alerte.model';
+import { NotificationResponse } from '../models/alerte.model';
+import { NotificationPreferences } from '../models/user.model';
 import { API_URLS } from '../config/app.config.api';
 
 @Injectable({ providedIn: 'root' })

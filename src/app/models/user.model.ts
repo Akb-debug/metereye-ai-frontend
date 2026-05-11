@@ -1,13 +1,10 @@
-// 🔄 MODIFIÉ — user.model.ts — ajouts : UserProfile, NotificationPreferences, UserState étendu
+// 🔄 MODIFIÉ — user.model.ts — corrections: AuthResponse champs nomComplet/userId alignés backend
 
 export interface AuthResponse {
   token:     string;
-  type:      string;
-  id:        number;
-  email:     string;
   role:      string;
-  nom:       string;
-  prenom:    string;
+  nomComplet: string;
+  userId:    number;
 }
 
 export interface LoginRequest {
@@ -36,6 +33,15 @@ export interface UserProfile {
   notificationPush:      boolean;
   notificationSms:       boolean;
   notificationEmail:     boolean;
+}
+
+export interface NotificationPreferences {
+  pushEnabled:    boolean;
+  emailEnabled:   boolean;
+  smsEnabled:     boolean;
+  creditAlerts:   boolean;
+  anomalyAlerts:  boolean;
+  systemAlerts:   boolean;
 }
 
 export interface UserState {

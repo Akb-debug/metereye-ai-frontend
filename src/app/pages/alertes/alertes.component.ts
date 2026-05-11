@@ -86,7 +86,7 @@ export class AlertesComponent implements OnInit {
 
   alerteIcon(type: string): string {
     switch (type) {
-      case 'CREDIT_FAIBLE':          return 'danger';
+      case 'SEUIL_CREDIT':           return 'danger';
       case 'COUPURE_IMMINENTE':      return 'danger';
       case 'ANOMALIE_CONSOMMATION':  return 'warning';
       case 'APPAREIL_HORS_LIGNE':    return 'warning';
@@ -99,14 +99,13 @@ export class AlertesComponent implements OnInit {
 
   alerteLabel(type: string): string {
     const map: Record<string, string> = {
-      CREDIT_FAIBLE:         'Crédit faible',
+      SEUIL_CREDIT:          'Crédit faible',
       COUPURE_IMMINENTE:     'Coupure imminente',
       ANOMALIE_CONSOMMATION: 'Anomalie',
       APPAREIL_HORS_LIGNE:   'Module hors ligne',
       APPAREIL_RECONNECTE:   'Module reconnecté',
       NOUVEAU_RELEVE:        'Nouveau relevé',
       RAPPORT_DISPONIBLE:    'Rapport disponible',
-      CONNEXION_UTILISATEUR: 'Connexion'
     };
     return map[type] ?? type;
   }
