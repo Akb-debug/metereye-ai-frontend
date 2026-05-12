@@ -1,5 +1,7 @@
 // 🔄 MODIFIÉ — app.routes.ts — routes complètes profil PERSONNEL avec lazy loading
 
+// 🔄 MODIFIÉ — app.routes.ts — routes complètes profil PERSONNEL avec lazy loading
+
 import { Routes } from '@angular/router';
 import { authGuard, redirectIfLoggedInGuard } from './guards/auth.guard';
 

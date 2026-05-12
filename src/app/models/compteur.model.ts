@@ -28,12 +28,13 @@ export interface StatutConfig {
 }
 
 export interface StatsResponse {
-  periode:               string;
-  consommationTotale:    number;
-  consommationMoyenne:   number;
-  consommationMax:       number;
-  consommationMin:       number;
-  nombreReleves:         number;
+  consommationJour:         number;
+  consommationSemaine:      number;
+  consommationMois:         number;
+  consommationMoyenneJour:  number;
+  creditRestant:            number;
+  dateEstimationEpuisement: string;
+  consommationParJour:      Record<string, number>;
 }
 
 export type ModeLecture = 'MANUAL' | 'ESP32_CAM' | 'SENSOR';

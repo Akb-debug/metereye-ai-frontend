@@ -33,8 +33,10 @@ export class CompteurService {
       .pipe(map(r => r.data));
   }
 
-  setModeLecture(id: number, mode: ModeLecture): Observable<any> {
-    return this.http.post(API_URLS.modeLecture(id), { modeLecture: mode });
+  setModeLecture(id: number, mode: ModeLecture, commentaire?: string): Observable<any> {
+    const body: any = { modeLecture: mode };
+    if (commentaire) body.commentaire = commentaire;
+    return this.http.post(API_URLS.modeLecture(id), body);
   }
 
   getStatutConfig(id: number): Observable<StatutConfig> {

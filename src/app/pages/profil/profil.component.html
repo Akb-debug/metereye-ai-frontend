@@ -1,4 +1,3 @@
-<!-- ✅ CRÉÉ — profil.component.html -->
 <app-toast></app-toast>
 
 <div class="app-layout">
@@ -6,159 +5,347 @@
 
   <div class="main-content">
     <app-header
-      pageTitle="Mon profil"
-      pageSubtitle="Gérez vos informations et préférences">
+      pageTitle="Profil & paramètres"
+      pageSubtitle="Gérez votre compte, votre sécurité et vos préférences.">
     </app-header>
 
     <div class="page-body">
 
       @if (isLoading) {
         <app-loading-spinner [size]="48" label="Chargement du profil..."></app-loading-spinner>
-      } @else if (!profil) {
-        <div class="empty-state">
-          <p>Impossible de charger le profil. Réessayez plus tard.</p>
-        </div>
       } @else {
 
-        <div class="profil-grid">
+        <div class="profil-layout">
 
-          <!-- Avatar + info rapide -->
-          <div class="card avatar-card">
-            <div class="big-avatar">{{ getInitiales() }}</div>
-            <h2 class="avatar-name">{{ profil.prenom }} {{ profil.nom }}</h2>
-            <p class="avatar-email">{{ profil.email }}</p>
-            <span class="badge badge-primary" style="margin-top:8px;text-transform:capitalize">
-              {{ profil.role | lowercase }}
-            </span>
-            <button class="btn btn-outline btn-sm btn-danger-outline" style="margin-top:20px;width:100%" (click)="deconnecter()">
-              <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-              </svg>
-              Déconnexion
-            </button>
-          </div>
+          <!-- ── Left aside ─────────────────────────────── -->
+          <aside class="profil-aside">
+            <div class="card aside-card">
 
-          <div class="profil-right">
+              <div class="avatar-circle">{{ getInitiales() }}</div>
+              <div class="aside-name">{{ profil?.nomComplet }}</div>
+              <div class="aside-sub">{{ roleLabel }} · {{ compteurs.length }} compteur{{ compteurs.length !== 1 ? 's' : '' }}</div>
+              <button class="btn btn-outline btn-sm aside-photo-btn">Changer la photo</button>
+
+              <nav class="aside-nav">
+                @for (item of navItems; track item.id) {
+                  <button
+                    class="aside-nav-item"
+                    [class.active]="activeSection === item.id"
+                    (click)="scrollTo(item.id)">
+                    {{ item.label }}
+                  </button>
+                }
+              </nav>
+
+            </div>
+          </aside>
+
+          <!-- ── Sections ───────────────────────────────── -->
+          <div class="profil-sections">
 
             <!-- Informations personnelles -->
-            <div class="card">
-              <div class="card-header">
-                <h3>Informations personnelles</h3>
+            <div class="card section-card" id="informations">
+              <div class="section-header">
+                <h3 class="section-title">Informations personnelles</h3>
+                <p class="section-sub">Mises à jour visibles sur les notifications et l'export.</p>
               </div>
-
               <form [formGroup]="infosForm" (ngSubmit)="sauvegarderInfos()">
                 <div class="grid-2">
                   <div class="form-group">
-                    <label>Prénom</label>
-                    <input type="text" class="form-control" formControlName="prenom"
-                      [class.is-invalid]="fi['prenom'].invalid && fi['prenom'].touched"/>
+                    <label class="form-label">Nom complet</label>
+                    <input type="text" class="form-control" formControlName="nomComplet"
+                      [class.is-invalid]="fi['nomComplet'].invalid && fi['nomComplet'].touched"
+                      placeholder="Prénom Nom"/>
+                    @if (fi['nomComplet'].invalid && fi['nomComplet'].touched) {
+                      <span class="field-err">Nom requis (2 caractères min.).</span>
+                    }
                   </div>
                   <div class="form-group">
-                    <label>Nom</label>
-                    <input type="text" class="form-control" formControlName="nom"
-                      [class.is-invalid]="fi['nom'].invalid && fi['nom'].touched"/>
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" formControlName="email"
+                      [class.is-invalid]="fi['email'].invalid && fi['email'].touched"
+                      placeholder="email@exemple.com"/>
+                    @if (fi['email'].invalid && fi['email'].touched) {
+                      <span class="field-err">Adresse email invalide.</span>
+                    }
                   </div>
                 </div>
-
                 <div class="form-group">
-                  <label>Adresse email</label>
-                  <input type="email" class="form-control" formControlName="email"
-                    [class.is-invalid]="fi['email'].invalid && fi['email'].touched"/>
+                  <label class="form-label">Téléphone</label>
+                  <div class="phone-wrap">
+                    <div class="phone-prefix">🇹🇬 +228</div>
+                    <input type="tel" class="form-control phone-num" formControlName="telephone"
+                      placeholder="90 12 34 56"/>
+                  </div>
                 </div>
-
-                <div class="form-group">
-                  <label>Téléphone</label>
-                  <input type="tel" class="form-control" formControlName="telephone"/>
-                </div>
-
-                <div style="display:flex;justify-content:flex-end">
-                  <button type="submit" class="btn btn-primary btn-sm" [disabled]="isSavingInfos">
+                <div class="section-footer">
+                  <button type="submit" class="btn btn-primary" [disabled]="isSavingInfos">
                     @if (isSavingInfos) { <span class="btn-spinner"></span> }
-                    Sauvegarder
+                    Enregistrer
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Sécurité -->
+            <div class="card section-card" id="securite">
+              <div class="section-header">
+                <h3 class="section-title">Sécurité</h3>
+                <p class="section-sub">Choisissez un mot de passe robuste, unique à MeterEye AI.</p>
+              </div>
+              <form [formGroup]="mdpForm" (ngSubmit)="changerMotDePasse()">
+                <div class="form-group">
+                  <label class="form-label">Mot de passe actuel</label>
+                  <input type="password" class="form-control mdp-solo" formControlName="ancienMotDePasse"
+                    [class.is-invalid]="fm['ancienMotDePasse'].invalid && fm['ancienMotDePasse'].touched"
+                    placeholder="••••••••"/>
+                </div>
+                <div class="grid-2">
+                  <div class="form-group">
+                    <label class="form-label">Nouveau mot de passe</label>
+                    <input type="password" class="form-control" formControlName="nouveauMotDePasse"
+                      [class.is-invalid]="fm['nouveauMotDePasse'].invalid && fm['nouveauMotDePasse'].touched"
+                      placeholder="••••••••••"/>
+                    <span class="field-help">Minimum 8 caractères, avec un chiffre.</span>
+                  </div>
+                  <div class="form-group">
+                    <label class="form-label">Confirmer le nouveau mot de passe</label>
+                    <input type="password" class="form-control" formControlName="confirmerMotDePasse"
+                      [class.is-invalid]="fm['confirmerMotDePasse'].touched && !!mdpForm.errors?.['mdpMismatch']"
+                      placeholder="••••••••••"/>
+                    @if (fm['confirmerMotDePasse'].touched && mdpForm.errors?.['mdpMismatch']) {
+                      <span class="field-err">Les mots de passe ne correspondent pas.</span>
+                    }
+                  </div>
+                </div>
+                <div class="section-footer">
+                  <button type="submit" class="btn btn-primary" [disabled]="isSavingMdp">
+                    @if (isSavingMdp) { <span class="btn-spinner"></span> }
+                    Changer le mot de passe
                   </button>
                 </div>
               </form>
             </div>
 
             <!-- Seuils d'alerte -->
-            <div class="card" style="margin-top:16px">
-              <div class="card-header">
-                <h3>Seuils d'alerte</h3>
+            <div class="card section-card" id="seuils">
+              <div class="section-header">
+                <h3 class="section-title">Seuils d'alerte</h3>
+                <p class="section-sub">Quand voulez-vous être prévenu ? S'applique à tous vos compteurs.</p>
               </div>
-
               <form [formGroup]="seuilsForm" (ngSubmit)="sauvegarderSeuils()">
                 <div class="grid-2">
                   <div class="form-group">
-                    <label>Seuil crédit Cash Power (%)</label>
-                    <input type="number" class="form-control" formControlName="seuilCredit"
-                      min="0" max="100"/>
-                    <span class="help-text">Alerte quand le crédit passe sous ce seuil</span>
+                    <label class="form-label">Seuil crédit faible (kWh)</label>
+                    <div class="input-sfx-wrap">
+                      <input type="number" class="form-control" formControlName="seuilCredit" min="0"/>
+                      <span class="input-sfx">kWh</span>
+                    </div>
+                    <span class="field-help">Recevez une alerte si le crédit Cash Power passe sous ce seuil.</span>
                   </div>
                   <div class="form-group">
-                    <label>Seuil anomalie consommation (kWh)</label>
-                    <input type="number" class="form-control" formControlName="seuilAnomalie" min="0"/>
-                    <span class="help-text">Alerte si consommation dépasse cette valeur</span>
+                    <label class="form-label">Seuil anomalie consommation (%)</label>
+                    <div class="input-sfx-wrap">
+                      <input type="number" class="form-control" formControlName="seuilAnomalie" min="0" max="200"/>
+                      <span class="input-sfx">%</span>
+                    </div>
+                    <span class="field-help">Alerte si la conso dépasse ce % de la moyenne.</span>
                   </div>
                 </div>
-
-                <div style="display:flex;justify-content:flex-end">
-                  <button type="submit" class="btn btn-primary btn-sm" [disabled]="isSavingSeuils">
+                <div class="section-footer">
+                  <button type="submit" class="btn btn-primary" [disabled]="isSavingSeuils">
                     @if (isSavingSeuils) { <span class="btn-spinner"></span> }
-                    Sauvegarder
+                    Enregistrer les seuils
                   </button>
                 </div>
               </form>
             </div>
 
             <!-- Préférences de notification -->
-            <div class="card" style="margin-top:16px">
-              <div class="card-header">
-                <h3>Préférences de notification</h3>
+            <div class="card section-card" id="notifications">
+              <div class="section-header">
+                <h3 class="section-title">Préférences de notification</h3>
+                <p class="section-sub">Choisissez les canaux et les types d'alerte.</p>
               </div>
 
-              <div class="toggle-row">
-                <div class="toggle-info">
-                  <div class="toggle-title">Notifications push</div>
-                  <div class="toggle-desc">Recevoir des notifications dans l'application</div>
+              <p class="notif-group-label">CANAUX</p>
+
+              <div class="notif-row">
+                <div class="notif-icon ni-bell">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                  </svg>
                 </div>
-                <label class="toggle-switch">
+                <div class="notif-info">
+                  <div class="notif-title">Notifications push</div>
+                  <div class="notif-desc">Reçues directement dans votre navigateur.</div>
+                </div>
+                <label class="tgl">
                   <input type="checkbox" [(ngModel)]="notifPush" [ngModelOptions]="{standalone:true}"/>
-                  <span class="toggle-thumb"></span>
+                  <span class="tgl-track"><span class="tgl-thumb"></span></span>
                 </label>
               </div>
 
-              <div class="toggle-row">
-                <div class="toggle-info">
-                  <div class="toggle-title">Notifications SMS</div>
-                  <div class="toggle-desc">Recevoir des alertes par SMS sur {{ profil.telephone }}</div>
+              <div class="notif-row">
+                <div class="notif-icon ni-mail">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
                 </div>
-                <label class="toggle-switch">
-                  <input type="checkbox" [(ngModel)]="notifSms" [ngModelOptions]="{standalone:true}"/>
-                  <span class="toggle-thumb"></span>
-                </label>
-              </div>
-
-              <div class="toggle-row">
-                <div class="toggle-info">
-                  <div class="toggle-title">Notifications email</div>
-                  <div class="toggle-desc">Recevoir des rapports et alertes par email</div>
+                <div class="notif-info">
+                  <div class="notif-title">Notifications par email</div>
+                  <div class="notif-desc">{{ profil?.email }}</div>
                 </div>
-                <label class="toggle-switch">
+                <label class="tgl">
                   <input type="checkbox" [(ngModel)]="notifEmail" [ngModelOptions]="{standalone:true}"/>
-                  <span class="toggle-thumb"></span>
+                  <span class="tgl-track"><span class="tgl-thumb"></span></span>
                 </label>
               </div>
 
-              <div style="display:flex;justify-content:flex-end;margin-top:16px">
-                <button class="btn btn-primary btn-sm" (click)="sauvegarderNotifs()" [disabled]="isSavingNotifs">
+              <div class="notif-row">
+                <div class="notif-icon ni-sms">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                  </svg>
+                </div>
+                <div class="notif-info">
+                  <div class="notif-title">Notifications par SMS</div>
+                  <div class="notif-desc">+228 {{ profil?.telephone }} · Frais opérateur usuels.</div>
+                </div>
+                <label class="tgl">
+                  <input type="checkbox" [(ngModel)]="notifSms" [ngModelOptions]="{standalone:true}"/>
+                  <span class="tgl-track"><span class="tgl-thumb"></span></span>
+                </label>
+              </div>
+
+              <div class="notif-sep"></div>
+              <p class="notif-group-label">TYPES D'ALERTE</p>
+
+              <div class="notif-row">
+                <div class="notif-icon ni-credit">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                </div>
+                <div class="notif-info">
+                  <div class="notif-title">Alertes crédit</div>
+                  <div class="notif-desc">Crédit faible et coupure imminente.</div>
+                </div>
+                <label class="tgl">
+                  <input type="checkbox" [(ngModel)]="alertCredit" [ngModelOptions]="{standalone:true}"/>
+                  <span class="tgl-track"><span class="tgl-thumb"></span></span>
+                </label>
+              </div>
+
+              <div class="notif-row">
+                <div class="notif-icon ni-anomalie">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+                  </svg>
+                </div>
+                <div class="notif-info">
+                  <div class="notif-title">Alertes anomalie</div>
+                  <div class="notif-desc">Consommation anormale par rapport à la moyenne.</div>
+                </div>
+                <label class="tgl">
+                  <input type="checkbox" [(ngModel)]="alertAnomalie" [ngModelOptions]="{standalone:true}"/>
+                  <span class="tgl-track"><span class="tgl-thumb"></span></span>
+                </label>
+              </div>
+
+              <div class="notif-row">
+                <div class="notif-icon ni-system">
+                  <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                  </svg>
+                </div>
+                <div class="notif-info">
+                  <div class="notif-title">Alertes système</div>
+                  <div class="notif-desc">Module ESP32-CAM ou capteur PZEM hors-ligne.</div>
+                </div>
+                <label class="tgl">
+                  <input type="checkbox" [(ngModel)]="alertSysteme" [ngModelOptions]="{standalone:true}"/>
+                  <span class="tgl-track"><span class="tgl-thumb"></span></span>
+                </label>
+              </div>
+
+              <div class="section-footer">
+                <button class="btn btn-primary" (click)="sauvegarderNotifs()" [disabled]="isSavingNotifs">
                   @if (isSavingNotifs) { <span class="btn-spinner"></span> }
-                  Sauvegarder
+                  Enregistrer les préférences
                 </button>
               </div>
             </div>
 
-          </div>
-        </div>
+            <!-- Mes compteurs -->
+            <div class="card section-card" id="mes-compteurs">
+              <div class="section-header">
+                <h3 class="section-title">Mes compteurs</h3>
+                <p class="section-sub">
+                  {{ compteurs.length }} compteur{{ compteurs.length !== 1 ? 's' : '' }}
+                  enregistré{{ compteurs.length !== 1 ? 's' : '' }} sur votre compte.
+                </p>
+              </div>
+
+              @if (compteurs.length === 0) {
+                <div class="empty-state" style="padding: 32px 0">
+                  <p>Aucun compteur associé à ce compte.</p>
+                </div>
+              } @else {
+                <div class="compteur-list">
+                  @for (c of compteurs; track c.id) {
+                    <div class="cpt-row">
+                      <div class="cpt-icon">
+                        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                      </div>
+                      <div class="cpt-info">
+                        <div class="cpt-ref">{{ c.reference }}</div>
+                        <div class="cpt-addr">{{ c.adresse }}</div>
+                      </div>
+                      <div class="cpt-badges">
+                        <span class="badge" [class.badge-blue]="c.typeCompteur === 'CASH_POWER'"
+                          [class.badge-purple]="c.typeCompteur === 'CLASSIQUE'">
+                          {{ typeLabel(c.typeCompteur) }}
+                        </span>
+                        <span class="badge"
+                          [class.badge-success]="c.statut === 'ACTIF'"
+                          [class.badge-muted]="c.statut !== 'ACTIF'">
+                          {{ c.statut }}
+                        </span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+
+            <!-- Langue & région -->
+            <div class="card section-card" id="langue">
+              <div class="section-header">
+                <h3 class="section-title">Langue & région</h3>
+                <p class="section-sub">Personnalisez la langue et le fuseau horaire de l'interface.</p>
+              </div>
+              <div class="grid-2">
+                <div class="form-group">
+                  <label class="form-label">Langue</label>
+                  <select class="form-control" disabled>
+                    <option>Français</option>
+                  </select>
+                  <span class="field-help">D'autres langues seront disponibles prochainement.</span>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Fuseau horaire</label>
+                  <select class="form-control" disabled>
+                    <option>Africa/Lome (UTC+0)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /profil-sections -->
+        </div><!-- /profil-layout -->
 
       }
     </div>

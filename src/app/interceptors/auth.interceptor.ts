@@ -29,10 +29,10 @@
 └─────────────────────────────────────────────────────┘
 */
 
-import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse } from '@angular/common/http';
+import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, throwError } from 'rxjs';
+import { catchError, throwError, of } from 'rxjs';
 import { STORAGE_KEYS } from '../config/app.config.api';
 
 // Liste des URLs qui N'ont PAS besoin du token JWT
@@ -106,6 +106,12 @@ export const authInterceptor: HttpInterceptorFn = (
 
 // Fonction utilitaire : transforme les erreurs HTTP en messages français
 function handleError(error: HttpErrorResponse, router: Router) {
+  // Status 200 dans le canal d'erreur = body vide non parsable comme JSON.
+  // Le backend a réussi mais n'a rien retourné — on laisse passer comme succès.
+  if (error.status === 200) {
+    return of(new HttpResponse<unknown>({ status: 200, body: null }));
+  }
+
   let message = 'Une erreur est survenue';
 
   switch (error.status) {

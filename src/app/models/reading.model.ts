@@ -2,12 +2,14 @@
 
 export interface ReadingResponse {
   id:           number;
-  meterId:      number;
+  meterId?:     number;
   value:        number;
-  date:         string;
-  source:       'MANUAL' | 'IMAGE' | 'SENSOR' | 'ESP32_CAM';
+  date?:        string;
+  dateTime?:    string;
+  source:       'MANUAL' | 'MANUEL' | 'IMAGE' | 'SENSOR' | 'ESP32_CAM';
   consumption?: number;
   imageUrl?:    string;
+  statut?:      string;
 }
 
 export interface ManualReadingRequest {

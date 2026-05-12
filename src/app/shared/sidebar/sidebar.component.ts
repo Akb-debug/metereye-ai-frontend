@@ -7,6 +7,8 @@ import { AuthService } from '../../services/auth.service';
 import { AlerteService } from '../../services/alerte.service';
 import { interval, Subscription } from 'rxjs';
 import { switchMap, startWith } from 'rxjs/operators';
+import { CompteurService } from '../../services/compteur.service';
+import { STORAGE_KEYS } from '../../config/app.config.api';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,10 +21,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   private authService   = inject(AuthService);
   private alerteService = inject(AlerteService);
+  private compteurService = inject(CompteurService)
 
   nomComplet        = signal(this.authService.getNomComplet());
   role              = signal(this.authService.getUserRole() ?? 'PERSONNEL');
   nbAlertesNonLues  = signal(0);
+  typeCompteur = localStorage.getItem(STORAGE_KEYS.typeCompteur);
+
+
 
   private pollingSubscription?: Subscription;
 

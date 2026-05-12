@@ -23,8 +23,8 @@ export interface RegisterRequest {
 
 export interface UserProfile {
   id:                    number;
-  nom:                   string;
-  prenom:                string;
+  nomComplet:            string;
+  username:              string;
   email:                 string;
   telephone:             string;
   role:                  string;
@@ -42,6 +42,11 @@ export interface NotificationPreferences {
   creditAlerts:   boolean;
   anomalyAlerts:  boolean;
   systemAlerts:   boolean;
+}
+
+export interface ChangePasswordRequest {
+  ancienMotDePasse:  string;
+  nouveauMotDePasse: string;
 }
 
 export interface UserState {

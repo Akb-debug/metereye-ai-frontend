@@ -1,4 +1,3 @@
-<!-- ✅ CRÉÉ — classique.component.html -->
 <app-toast></app-toast>
 
 <div class="app-layout">
@@ -6,102 +5,269 @@
 
   <div class="main-content">
     <app-header
-      pageTitle="Tableau de bord Classique"
-      pageSubtitle="Suivi de vos index cumulatifs et de votre consommation">
+      [pageTitle]="salutation + ' ' + prenom + ' 👋'"
+      [pageSubtitle]="dateAujourdhui + ' · Voici l\'état de votre consommation aujourd\'hui.'">
 
-      @if (estManuel && compteur) {
-        <button class="btn btn-primary" (click)="ouvrirModal()">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#fff" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+      @if (compteur) {
+        <div class="hdr-chip">
+          <span class="hdr-dot"></span>
+          {{ compteur.reference }} · Classique
+          <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
           </svg>
-          Ajouter un relevé
-        </button>
+        </div>
       }
+      <button class="hdr-bell">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+        </svg>
+      </button>
     </app-header>
 
     <div class="page-body">
 
       @if (isLoading) {
-        <app-loading-spinner [size]="48" label="Chargement des données..."></app-loading-spinner>
+        <app-loading-spinner [size]="48" label="Chargement du tableau de bord..."></app-loading-spinner>
       } @else if (!compteur) {
         <div class="empty-state">
           <svg width="56" height="56" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
           </svg>
           <p>Aucun compteur configuré.</p>
         </div>
       } @else {
 
-        <!-- Ligne 1 : Stats -->
-        <div class="stats-grid">
+        <!-- ── Hero card ───────────────────────────────────── -->
+        <div class="hero-card">
+          <div class="hero-blob hero-blob-1"></div>
+          <div class="hero-blob hero-blob-2"></div>
 
-          <!-- Index actuel -->
-          <div class="card">
-            <p class="stat-label">Index actuel</p>
-            <p class="index-value">
-              {{ compteur.valeurActuelle | number:'1.0-0' }}
-              <span style="font-size:20px;color:var(--color-text-light)"> kWh</span>
-            </p>
-            <p class="stat-sub">Valeur cumulée depuis installation</p>
-
-            @if (dernierReleve) {
-              <div class="index-footer">
-                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="var(--color-text-muted)" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                Dernier relevé : {{ dernierReleve.date | date:'dd/MM/yyyy HH:mm' }}
-              </div>
-            }
-          </div>
-
-          <!-- Consommation période -->
-          <div class="card">
-            <p class="stat-label">Consommation estimée</p>
-            <p class="index-value" style="color:var(--color-warning)">
-              {{ consommationEstimee | number:'1.0-0' }}
-              <span style="font-size:20px;color:var(--color-text-light)"> kWh</span>
-            </p>
-            <p class="stat-sub">Différence entre les 2 derniers relevés</p>
-
-            @if (avantDernierReleve) {
-              <div class="index-footer">
-                Relevé précédent : {{ avantDernierReleve.value | number:'1.0-0' }} kWh
-              </div>
-            }
-          </div>
-
-          <!-- Mode lecture -->
-          <div class="card">
-            <div class="stat-icon" style="background:#F3F4F6;margin-bottom:12px">
-              <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="var(--color-text-light)" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-              </svg>
-            </div>
-            <p class="stat-label">Compteur</p>
-            <p class="stat-value" style="font-size:16px">{{ compteur.reference }}</p>
-            <p class="stat-sub">{{ compteur.adresse }}</p>
-
-            @if (statut) {
-              <div style="margin-top:8px">
-                <span class="badge" [class.badge-success]="statut.configurePourLecture" [class.badge-gray]="!statut.configurePourLecture">
-                  {{ statut.configurePourLecture ? '● Configuré' : '○ Non configuré' }}
+          <div class="hero-body">
+            <div class="hero-left">
+              <div class="hero-badges">
+                <span class="hero-badge-type">CLASSIQUE · {{ compteur.reference }}</span>
+                <span class="hero-badge-mode">
+                  <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                  </svg>
+                  {{ sourceLectureLabel }}
                 </span>
               </div>
-            }
+
+              <p class="hero-index-label">Index actuel</p>
+              <div class="hero-value">
+                {{ indexActuel | number:'1.1-1' }}
+                <span class="hero-unit">kWh</span>
+              </div>
+
+              <div class="hero-stats-row">
+                <div class="hero-stat">
+                  <span class="hero-stat-label">Index précédent</span>
+                  <span class="hero-stat-val">{{ indexPrecedent | number:'1.1-1' }} kWh</span>
+                </div>
+                <div class="hero-stat-sep"></div>
+                <div class="hero-stat">
+                  <span class="hero-stat-label">Conso ce mois</span>
+                  <span class="hero-stat-val">+ {{ consoMois | number:'1.1-1' }} kWh</span>
+                </div>
+                <div class="hero-stat-sep"></div>
+                <div class="hero-stat">
+                  <span class="hero-stat-label">Estimation facture</span>
+                  <span class="hero-stat-val">~ {{ estimationFcfa | number:'1.0-0' }} FCFA</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="hero-right">
+              <button class="hero-btn-releve" (click)="ouvrirModal()">
+                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+                Ajouter un relevé
+              </button>
+              @if (dernierReleve) {
+                <div class="hero-last">
+                  <div class="hero-last-date">Dernier relevé · {{ formatRelDate(dernierReleve) }}</div>
+                  <div class="hero-last-mode">{{ estManuel ? 'saisi manuellement' : 'relevé automatique' }}</div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- ── 3 Stat cards ────────────────────────────────── -->
+        <div class="stat-cards">
+
+          <div class="stat-card">
+            <div class="stat-icon si-clock">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <p class="stat-lbl">Conso aujourd'hui</p>
+            <p class="stat-val">{{ consoJour | number:'1.1-1' }} <span class="stat-unit">kWh</span></p>
+            <p class="stat-trend" [class]="tendanceClass(tendanceJour)">{{ tendanceLabel(tendanceJour) }}</p>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon si-clock">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+            </div>
+            <p class="stat-lbl">Conso ce mois</p>
+            <p class="stat-val">{{ consoMois | number:'1.1-1' }} <span class="stat-unit">kWh</span></p>
+            <p class="stat-trend" [class]="tendanceClass(tendanceMois)">{{ tendanceLabel(tendanceMois) }}</p>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-icon si-sun">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+              </svg>
+            </div>
+            <p class="stat-lbl">Moyenne journalière</p>
+            <p class="stat-val">{{ moyenneJour | number:'1.1-1' }} <span class="stat-unit">kWh/jour</span></p>
+            <p class="stat-trend trend-up">↑ +1 % vs hier</p>
           </div>
 
         </div>
 
-        <!-- Graphique -->
-        <div class="card" style="margin-top:20px">
-          <div class="card-header">
-            <h3>Consommation par jour</h3>
-            <div style="display:flex;gap:8px">
-              <button class="btn btn-sm" [class.btn-primary]="periodeStats === 'week'" [class.btn-outline]="periodeStats !== 'week'" (click)="changerPeriode('week')">7 jours</button>
-              <button class="btn btn-sm" [class.btn-primary]="periodeStats === 'month'" [class.btn-outline]="periodeStats !== 'month'" (click)="changerPeriode('month')">30 jours</button>
+        <!-- ── Chart card ──────────────────────────────────── -->
+        <div class="card chart-card">
+          <div class="chart-hdr">
+            <div>
+              <h3 class="chart-title">
+                Consommation des
+                {{ periodeStats === 'month' ? '30' : periodeStats === 'day' ? '1' : '7' }}
+                derniers jours
+              </h3>
+              <p class="chart-sub">{{ dateRange }} · Total {{ totalPeriode | number:'1.1-1' }} kWh</p>
+            </div>
+            <div class="periode-tabs">
+              <button class="periode-tab" [class.active]="periodeStats === 'day'"   (click)="changerPeriode('day')">Jour</button>
+              <button class="periode-tab" [class.active]="periodeStats === 'week'"  (click)="changerPeriode('week')">Semaine</button>
+              <button class="periode-tab" [class.active]="periodeStats === 'month'" (click)="changerPeriode('month')">Mois</button>
             </div>
           </div>
-          <app-bar-chart [data]="chartData"></app-bar-chart>
+
+          @if (chartDays.length === 0) {
+            <div class="chart-empty">Aucune donnée disponible pour cette période.</div>
+          } @else {
+            <div class="chart-area" [class.col-dense]="periodeStats === 'month'">
+              @if (chartMoyenne > 0) {
+                <div class="avg-line" [style.bottom.px]="avgLinePx">
+                  <span class="avg-label">moy {{ chartMoyenne | number:'1.1-1' }} kWh</span>
+                </div>
+              }
+              @for (day of chartDays; track day.label + $index) {
+                <div class="bar-col">
+                  <span class="bar-val">{{ day.value > 0 ? (day.value | number:'1.1-1') : '' }}</span>
+                  <div class="bar-wrap">
+                    <div class="bar-fill"
+                      [class.bar-today]="day.isToday"
+                      [class.bar-max]="day.isMax"
+                      [style.height.%]="day.heightPct">
+                    </div>
+                  </div>
+                  <span class="bar-label">{{ day.label }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- ── Bottom 2-col ───────────────────────────────── -->
+        <div class="bottom-grid">
+
+          <!-- Alertes récentes -->
+          <div class="card bottom-card">
+            <div class="bottom-hdr">
+              <div>
+                <h3 class="bottom-title">Alertes récentes</h3>
+                <p class="bottom-sub">{{ alertesRecentes.length }} alerte{{ alertesRecentes.length !== 1 ? 's' : '' }} ce mois</p>
+              </div>
+              <a class="bottom-link" routerLink="/alertes">Tout voir →</a>
+            </div>
+
+            @if (alertesRecentes.length === 0) {
+              <div class="empty-state" style="padding:24px 0">
+                <p>Aucune alerte récente.</p>
+              </div>
+            } @else {
+              <div class="alerte-list">
+                @for (a of alertesRecentes; track a.id) {
+                  <div class="alerte-row">
+                    <div class="alerte-icon" [class]="alerteIconClass(a.type)">
+                      @if (a.type === 'ANOMALIE_CONSOMMATION') {
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                      } @else if (a.type === 'NOUVEAU_RELEVE' || a.type === 'APPAREIL_RECONNECTE') {
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                      } @else {
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                        </svg>
+                      }
+                    </div>
+                    <div class="alerte-body">
+                      <span class="alerte-type">{{ alerteLabelCourt(a.type) }}</span>
+                      <span class="alerte-msg">{{ a.message }}</span>
+                    </div>
+                    <span class="alerte-time">{{ alerteTemps(a.dateCreation) }}</span>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+
+          <!-- Derniers relevés -->
+          <div class="card bottom-card">
+            <div class="bottom-hdr">
+              <div>
+                <h3 class="bottom-title">Derniers relevés</h3>
+                <p class="bottom-sub">{{ derniersReleves.length }} dernières lectures</p>
+              </div>
+              <a class="bottom-link" routerLink="/historique">Voir l'historique →</a>
+            </div>
+
+            @if (derniersReleves.length === 0) {
+              <div class="empty-state" style="padding:24px 0">
+                <p>Aucun relevé enregistré.</p>
+              </div>
+            } @else {
+              <table class="releve-table">
+                <thead>
+                  <tr>
+                    <th>DATE</th>
+                    <th>VALEUR</th>
+                    <th>SOURCE</th>
+                    <th>STATUT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (r of derniersReleves; track r.id) {
+                    <tr>
+                      <td class="td-date">{{ formatRelDate(r) }}</td>
+                      <td class="td-val">{{ r.value | number:'1.1-1' }} <span class="td-unit">kWh</span></td>
+                      <td>
+                        <span class="src-badge" [class]="sourceBadgeClass(r.source)">{{ sourceLabel(r.source) }}</span>
+                      </td>
+                      <td>
+                        <span class="statut-badge" [class.sv]="isValid(r)" [class.si]="!isValid(r)">
+                          <span class="statut-dot"></span>{{ isValid(r) ? 'VALID' : 'INVALID' }}
+                        </span>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+
         </div>
 
       }
@@ -109,44 +275,39 @@
   </div>
 </div>
 
-<!-- MODALE relevé -->
+<!-- ── Modal ajout relevé ────────────────────────────────── -->
 @if (showModal) {
   <div class="modal-overlay" (click.self)="fermerModal()">
     <div class="modal-box">
       <div class="modal-header">
         <h3>Saisir un index de compteur</h3>
         <button class="btn-close" (click)="fermerModal()">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
         </button>
       </div>
-
-      <form [formGroup]="releveForm" (ngSubmit)="ajouterReleve()">
+      <form [formGroup]="releveForm" (ngSubmit)="ajouterReleve()" style="padding:20px 24px">
         <div class="form-group">
           <label>Index du compteur (kWh cumulé)</label>
           <input type="number" class="form-control" formControlName="value"
             [class.is-invalid]="rf['value'].invalid && rf['value'].touched"
-            placeholder="Ex : 12547" step="1" min="0"/>
+            placeholder="Ex : 1620.5" step="0.1" min="0"/>
           @if (rf['value'].invalid && rf['value'].touched) {
             <span class="error-msg">Valeur requise (≥ 0).</span>
           }
           @if (dernierReleve) {
-            <span class="help-text">Dernier index enregistré : {{ dernierReleve.value | number:'1.0-0' }} kWh</span>
+            <span class="help-text">Dernier index : {{ dernierReleve.value | number:'1.1-1' }} kWh</span>
           }
         </div>
-
-        <div class="form-group">
-          <label>Commentaire (optionnel)</label>
-          <input type="text" class="form-control" formControlName="comment"
-            placeholder="Ex : Relevé mensuel de janvier"/>
-        </div>
-
         @if (errorMessage) {
-          <div class="error-box" style="margin-bottom:16px">
-            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="#EF4444" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+          <div class="error-box">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/>
+            </svg>
             {{ errorMessage }}
           </div>
         }
-
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" (click)="fermerModal()">Annuler</button>
           <button type="submit" class="btn btn-primary" [disabled]="isSaving">

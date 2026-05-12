@@ -43,9 +43,10 @@ export const API_URLS = {
   myDevices:      `${BASE}/devices/my`,
 
   // User
-  profil:        `${BASE}/users/profile`,
-  updateSeuils:  `${BASE}/users/seuils`,
-  updateNotifs:  `${BASE}/users/notifications`,
+  profil:          `${BASE}/users/profile`,
+  updateSeuils:    `${BASE}/users/seuils`,
+  updateNotifs:    `${BASE}/users/notifications`,
+  changePassword:  `${BASE}/users/password`,
 };
 
 export const STORAGE_KEYS = {
