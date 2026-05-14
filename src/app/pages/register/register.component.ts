@@ -44,6 +44,12 @@ export class RegisterComponent implements OnInit {
       label: 'Propriétaire',
       desc:  'Maison avec plusieurs locataires à gérer en sous-comptes.',
       icon:  'building'
+    },
+    {
+      value: 'LOCATAIRE',
+      label: 'Locataire',
+      desc:  'Suit sa propre consommation via un accès partagé.',
+      icon:  'home'
     }
   ];
 

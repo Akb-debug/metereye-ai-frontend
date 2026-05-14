@@ -21,6 +21,10 @@ export const API_URLS = {
   releveManuel: `${BASE}/compteurs/releves`,
   recharge:     `${BASE}/compteurs/recharge`,
 
+  // Maisons
+  maisons:      `${BASE}/maisons`,
+  maison:       (id: number) => `${BASE}/maisons/${id}`,
+
   // Readings
   readingsManual:  `${BASE}/readings/manual`,
   readingsByMeter: (id: number) => `${BASE}/readings/meters/${id}`,
@@ -47,6 +51,20 @@ export const API_URLS = {
   updateSeuils:    `${BASE}/users/seuils`,
   updateNotifs:    `${BASE}/users/notifications`,
   changePassword:  `${BASE}/users/password`,
+  
+  // Sous-compteurs (Additionneuses) & Locataires
+  sousCompteurs:        `${BASE}/sous-compteurs`,
+  sousCompteursMaison:  (id: number) => `${BASE}/sous-compteurs/maison/${id}`,
+  creerLocataire:       `${BASE}/sous-compteurs/locataires`,
+  locatairesMaison:     (id: number) => `${BASE}/sous-compteurs/locataires/maison/${id}`,
+  desactiverLocataire:  (id: number) => `${BASE}/sous-compteurs/locataires/${id}`,
+
+  // Facturation / Répartition
+  repartitionApercu: (maisonId: number, mois: number, annee: number, montant: number) => 
+    `${BASE}/repartition/apercu?maisonId=${maisonId}&mois=${mois}&annee=${annee}&montantFacturePrincipale=${montant}`,
+  repartitionGenerer: `${BASE}/repartition/generer`,
+  repartitionMaison: (maisonId: number, mois: number, annee: number) => 
+    `${BASE}/repartition/maison/${maisonId}?mois=${mois}&annee=${annee}`,
 };
 
 export const STORAGE_KEYS = {

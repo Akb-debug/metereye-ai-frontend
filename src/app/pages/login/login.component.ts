@@ -69,7 +69,15 @@ export class LoginComponent implements OnInit {
     this.compteurService.getMesCompteurs().subscribe({
       next: (compteurs) => {
         this.isLoading = false;
-        if (!compteurs || compteurs.length === 0) {
+        if (this.authService.getUserRole() === 'PROPRIETAIRE') {
+          this.router.navigate(['/dashboard/proprietaire']);
+        } else if (this.authService.getUserRole() === 'LOCATAIRE') {
+          if (compteurs && compteurs.length > 0) {
+            this.compteurService.sauvegarderCompteurId(compteurs[0].id);
+            this.compteurService.sauvegarderTypeCompteur(compteurs[0].typeCompteur);
+          }
+          this.router.navigate(['/dashboard/locataire']);
+        } else if (!compteurs || compteurs.length === 0) {
           this.router.navigate(['/onboarding/compteur']);
         } else {
           const c = compteurs[0];

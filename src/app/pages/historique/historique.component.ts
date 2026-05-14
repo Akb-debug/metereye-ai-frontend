@@ -3,8 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { SidebarComponent }       from '../../shared/sidebar/sidebar.component';
-import { HeaderComponent }        from '../../shared/header/header.component';
-import { LoadingSpinnerComponent } from '../../shared/loading-spinner/loading-spinner.component';
 import { ToastComponent }         from '../../shared/toast/toast.component';
 import { ToastService }           from '../../services/toast.service';
 
@@ -16,7 +14,7 @@ import { ReadingResponse }  from '../../models/reading.model';
 @Component({
   selector: 'app-historique',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, SidebarComponent, HeaderComponent, LoadingSpinnerComponent, ToastComponent],
+  imports: [CommonModule, ReactiveFormsModule, SidebarComponent, ToastComponent],
   templateUrl: './historique.component.html',
   styleUrl: './historique.component.scss'
 })

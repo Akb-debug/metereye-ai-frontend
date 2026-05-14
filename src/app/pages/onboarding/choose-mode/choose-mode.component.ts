@@ -27,6 +27,7 @@ export class ChooseModeComponent {
   modeSelectionne: ModeLecture = 'MANUAL';
 
   get nomComplet(): string { return this.authService.getNomComplet(); }
+  get isProprietaire(): boolean { return this.authService.getUserRole() === 'PROPRIETAIRE'; }
 
   modes = [
     {

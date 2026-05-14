@@ -1,161 +1,115 @@
-// Rôle : Tableau de bord pour les propriétaires.
-// Affiche une vue d'ensemble des compteurs et des locataires.
-
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
 import { AuthService } from '../../../services/auth.service';
+import { MaisonService } from '../../../services/maison.service';
+import { CompteurService } from '../../../services/compteur.service';
+import { AlerteService } from '../../../services/alerte.service';
+import { FacturationService } from '../../../services/facturation.service';
+import { MaisonResponse } from '../../../models/maison.model';
+import { AlerteResponse } from '../../../models/alerte.model';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-proprietaire',
   standalone: true,
-  template: `
-    <!-- A) NAVBAR -->
-    <nav class="navbar">
-      <div class="nav-brand">MeterEye AI</div>
-      <div class="nav-center">
-        <span class="user-name">{{ nomComplet }}</span>
-        <span class="badge-role">Propriétaire</span>
-      </div>
-      <button class="btn-logout" (click)="seDeconnecter()">Déconnexion</button>
-    </nav>
-
-    <!-- B) CONTENU -->
-    <main class="dashboard-content">
-      <h1 class="page-title">Tableau de bord Propriétaire</h1>
-      <p class="text-muted">Les données s'afficheront ici prochainement.</p>
-
-      <div class="cards-grid">
-        <div class="card">
-          <div class="card-value">—</div>
-          <div class="card-label">Mes compteurs</div>
-        </div>
-        <div class="card">
-          <div class="card-value">—</div>
-          <div class="card-label">Relevés ce mois</div>
-        </div>
-        <div class="card">
-          <div class="card-value">—</div>
-          <div class="card-label">Alertes</div>
-        </div>
-        <div class="card">
-          <div class="card-value">—</div>
-          <div class="card-label">Locataires</div>
-        </div>
-      </div>
-    </main>
-  `,
-  styles: [`
-    :host {
-      display: block;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f9fafb;
-      min-height: 100vh;
-    }
-    
-    /* Navbar */
-    .navbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background-color: #15803d;
-      color: white;
-      height: 60px;
-      padding: 0 2rem;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .nav-brand {
-      font-weight: bold;
-      font-size: 1.25rem;
-    }
-    .nav-center {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .user-name {
-      font-weight: 500;
-    }
-    .badge-role {
-      background-color: rgba(255, 255, 255, 0.2);
-      padding: 0.25rem 0.75rem;
-      border-radius: 999px;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .btn-logout {
-      background: transparent;
-      border: 1px solid white;
-      color: white;
-      padding: 0.35rem 1rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: background-color 0.2s;
-    }
-    .btn-logout:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    /* Contenu */
-    .dashboard-content {
-      padding: 2rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    .page-title {
-      font-size: 1.5rem;
-      color: #111827;
-      margin-top: 0;
-      margin-bottom: 0.5rem;
-    }
-    .text-muted {
-      color: #6b7280;
-      margin-bottom: 2rem;
-    }
-
-    /* Grille de cartes */
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1.5rem;
-    }
-    @media (min-width: 768px) {
-      .cards-grid {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    /* Carte */
-    .card {
-      background-color: white;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 1.5rem;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .card-value {
-      font-size: 28px;
-      font-weight: bold;
-      color: #16a34a;
-      margin-bottom: 0.5rem;
-    }
-    .card-label {
-      font-size: 12px;
-      color: #6b7280;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-  `]
+  imports: [CommonModule, SidebarComponent],
+  templateUrl: './proprietaire.component.html',
+  styleUrl: './proprietaire.component.scss'
 })
-export class ProprietaireComponent {
-  private authService = inject(AuthService);
-  
-  nomComplet = this.authService.getNomComplet() || 'Utilisateur';
+export class ProprietaireComponent implements OnInit {
+  private authService      = inject(AuthService);
+  private maisonService    = inject(MaisonService);
+  private compteurService  = inject(CompteurService);
+  private alerteService    = inject(AlerteService);
+  private facturationService = inject(FacturationService);
 
-  seDeconnecter(): void {
-    this.authService.logout();
+  currentDate = new Date();
+  prenom = signal<string>('');
+  activeMaison = signal<MaisonResponse | null>(null);
+  stats = signal<any>(null);
+  recentAlertes = signal<AlerteResponse[]>([]);
+  locatairesData = signal<any[]>([]);
+  isLoading = signal(true);
+
+  // Chart data (mock logic for now if backend not ready, but structure is dynamic)
+  chartData = signal<{label: string, value: number}[]>([]);
+
+  ngOnInit(): void {
+    this.prenom.set(this.authService.getNomComplet()?.split(' ')[0] || 'Utilisateur');
+    this.loadAllData();
+  }
+
+  loadAllData(): void {
+    this.isLoading.set(true);
+    this.maisonService.getMaisons().subscribe({
+      next: (maisons) => {
+        if (maisons.length > 0) {
+          const maison = maisons[0];
+          this.activeMaison.set(maison);
+          
+          const requests: any = {
+            alertes: this.alerteService.getAlertes(),
+          };
+
+          if (maison.compteurPrincipalId) {
+            requests.stats = this.compteurService.getStats(maison.compteurPrincipalId, 'month');
+          }
+
+          // On pourrait ajouter les factures ici aussi
+          this.facturationService.getFacturesMaison(maison.id, new Date().getMonth() + 1, new Date().getFullYear()).subscribe({
+            next: (factRes) => {
+              this.locatairesData.set(factRes.items || []);
+            },
+            error: () => {}
+          });
+
+          forkJoin(requests).subscribe({
+            next: (res: any) => {
+              this.recentAlertes.set(res.alertes.slice(0, 3));
+              if (res.stats) {
+                this.stats.set(res.stats);
+                this.processChartData(res.stats.consommationParJour);
+              }
+              this.isLoading.set(false);
+            },
+            error: () => this.isLoading.set(false)
+          });
+        } else {
+          this.isLoading.set(false);
+        }
+      },
+      error: () => this.isLoading.set(false)
+    });
+  }
+
+  processChartData(data: {[key: string]: number}): void {
+    if (!data) return;
+    const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    const today = new Date().toLocaleDateString('fr-FR', { weekday: 'short' });
+    
+    // On extrait les valeurs pour les 7 derniers jours ou on mappe par jour de la semaine
+    const mapped = days.map(day => {
+      // Note: mapping simple pour la démo, en réel on utiliserait les clés ISO du backend
+      const val = data[day] || Object.values(data)[days.indexOf(day)] || 0;
+      return {
+        label: day,
+        value: val
+      };
+    });
+    this.chartData.set(mapped);
+  }
+
+  getAlertClass(type: string): string {
+    switch(type) {
+      case 'DANGER': return 'alert-danger';
+      case 'WARNING': return 'alert-warning';
+      default: return 'alert-success';
+    }
+  }
+
+  getAlertIcon(type: string): string {
+    // Retourne le code SVG ou une classe d'icône
+    return '';
   }
 }

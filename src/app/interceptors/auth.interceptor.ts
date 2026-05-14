@@ -106,10 +106,10 @@ export const authInterceptor: HttpInterceptorFn = (
 
 // Fonction utilitaire : transforme les erreurs HTTP en messages français
 function handleError(error: HttpErrorResponse, router: Router) {
-  // Status 200 dans le canal d'erreur = body vide non parsable comme JSON.
+  // Status 200/201 dans le canal d'erreur = body vide non parsable comme JSON.
   // Le backend a réussi mais n'a rien retourné — on laisse passer comme succès.
-  if (error.status === 200) {
-    return of(new HttpResponse<unknown>({ status: 200, body: null }));
+  if (error.status === 200 || error.status === 201) {
+    return of(new HttpResponse<unknown>({ status: error.status, body: null }));
   }
 
   let message = 'Une erreur est survenue';

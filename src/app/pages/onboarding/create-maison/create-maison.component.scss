@@ -19,7 +19,6 @@
   font-size: 17px;
   font-weight: 600;
   color: var(--color-dark);
-
   strong { color: var(--color-primary); font-weight: 700; }
 }
 
@@ -35,7 +34,6 @@
 .onb-user {
   font-size: 13px;
   color: var(--color-text-light);
-
   strong { color: var(--color-dark); font-weight: 600; }
 }
 
@@ -63,7 +61,6 @@
 .onb-stepper {
   display: flex;
   align-items: center;
-  gap: 0;
 }
 
 .onb-step {
@@ -83,7 +80,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   transition: all var(--transition);
 
   .onb-step.active & {
@@ -91,20 +87,12 @@
     border-color: var(--color-primary);
     color: #fff;
   }
-
-  .onb-step.success & {
-    background: #DCFCE7;
-    border-color: #22C55E;
-    color: #15803D;
-  }
 }
 
 .onb-step-label {
   font-size: 13px;
   font-weight: 500;
   color: var(--color-text-muted);
-  white-space: nowrap;
-
   .onb-step.active & {
     color: var(--color-dark);
     font-weight: 600;
@@ -116,11 +104,6 @@
   height: 2px;
   background: var(--color-border);
   margin: 0 12px;
-  flex-shrink: 0;
-
-  &.active {
-    background: var(--color-primary);
-  }
 }
 
 // ─── Page + card ────────────────────────────────────────────────────────────
@@ -156,136 +139,12 @@
 
 .text-primary { color: var(--color-primary); }
 
-// ─── Input with unit suffix ─────────────────────────────────────────────────
-.input-unit-wrap {
-  display: flex;
-  align-items: center;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-  background: #fff;
-  transition: border-color var(--transition);
-
-  &:focus-within { border-color: var(--color-primary); }
-  &.is-invalid   { border-color: var(--color-danger); }
-}
-
-.input-unit {
-  flex: 1;
-  border: none !important;
-  border-radius: 0 !important;
-  box-shadow: none !important;
-  &:focus { outline: none; box-shadow: none !important; }
-}
-
-.unit-suffix {
-  padding: 0 14px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  border-left: 1px solid var(--color-border);
-  height: 42px;
-  display: flex;
-  align-items: center;
-  background: var(--color-bg);
-  flex-shrink: 0;
-}
-
-// ─── Section label ───────────────────────────────────────────────────────────
-.section-label {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--color-dark);
-  margin: 4px 0 12px;
-}
-
-// ─── Type cards ─────────────────────────────────────────────────────────────
-.type-cards-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 24px;
-}
-
-.type-card {
-  position: relative;
-  padding: 18px 16px 16px;
-  border: 2px solid var(--color-border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  background: #fff;
-  transition: border-color var(--transition), background var(--transition);
-
-  &:hover { border-color: var(--color-primary); }
-
-  &.selected {
-    border-color: var(--color-primary);
-    background: #fff;
-  }
-}
-
-.type-check {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 22px; height: 22px;
-  background: var(--color-primary);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.type-icon {
-  width: 44px; height: 44px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
-
-  &.icon-yellow { background: #FEF3C7; }
-  &.icon-blue   { background: #DBEAFE; }
-}
-
-.type-card-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.type-card-name {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--color-dark);
-}
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 600;
-
-  &.badge-yellow { background: #FEF3C7; color: #92400E; }
-  &.badge-gray   { background: #F3F4F6; color: #6B7280; }
-}
-
-.type-card-desc {
-  font-size: 12px;
-  color: var(--color-text-light);
-  line-height: 1.5;
-  margin: 0;
-}
-
 // ─── Footer actions ──────────────────────────────────────────────────────────
 .onb-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 8px;
+  margin-top: 24px;
 }
 
 .btn-back {
@@ -299,7 +158,6 @@
   &:hover { color: var(--color-dark); }
 }
 
-// ─── Spinner ─────────────────────────────────────────────────────────────────
 .btn-spinner {
   width: 16px; height: 16px;
   border: 2px solid rgba(255,255,255,.4);

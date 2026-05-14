@@ -19,8 +19,7 @@ import { AlerteResponse, NotificationResponse } from '../../models/alerte.model'
   standalone: true,
   imports: [
     CommonModule,
-    SidebarComponent, HeaderComponent,
-    LoadingSpinnerComponent, ToastComponent
+    SidebarComponent, ToastComponent
   ],
   templateUrl: './alertes.component.html',
   styleUrl: './alertes.component.scss'

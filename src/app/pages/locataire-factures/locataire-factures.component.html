@@ -1,0 +1,82 @@
+<app-sidebar></app-sidebar>
+
+<main class="main-content">
+  <header class="page-header">
+    <div class="header-left">
+      <h1 class="page-title">Mes factures <span class="badge-count">6 factures</span></h1>
+    </div>
+    <div class="header-right">
+      <div class="filter-group">
+        <select class="form-select select-year">
+          <option>2026</option>
+          <option>2025</option>
+        </select>
+        <select class="form-select select-status">
+          <option>Toutes</option>
+          <option>Payées</option>
+          <option>En attente</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <span class="spinner"></span>
+      <p>Chargement de vos factures...</p>
+    </div>
+  } @else {
+    
+    <div class="factures-list">
+      @for (fact of factures(); track fact.id) {
+        <div class="card facture-card">
+          <div class="facture-icon">
+             <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+             </svg>
+          </div>
+          
+          <div class="facture-main">
+            <h3 class="facture-title">Facture {{ fact.moisLabel }} {{ fact.annee }}</h3>
+            <p class="facture-subtitle">Additionneuse {{ fact.compteurRef }}</p>
+          </div>
+
+          <div class="facture-data">
+            <div class="data-item">
+              <span class="label">Consommation</span>
+              <span class="value">{{ fact.consommation }} kWh</span>
+            </div>
+            <div class="data-item">
+              <span class="label">Part</span>
+              <span class="value">{{ fact.partPourcentage }}% de la maison</span>
+            </div>
+            <div class="data-item">
+              <span class="label">Montant</span>
+              <span class="value montant">{{ fact.montant | number }} FCFA</span>
+            </div>
+            <div class="data-item">
+              <span class="label">Générée le</span>
+              <span class="value">{{ fact.dateGeneration | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+
+          <div class="facture-actions">
+            <span class="badge-status status-success">
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+              Disponible
+            </span>
+            <button class="btn btn-primary btn-sm btn-download">
+              <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+              </svg>
+              Télécharger PDF
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+
+  }
+</main>

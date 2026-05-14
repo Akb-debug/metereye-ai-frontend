@@ -29,6 +29,7 @@ export class CreateCompteurComponent implements OnInit {
   typeSelectionne: 'CLASSIQUE' | 'CASH_POWER' = 'CASH_POWER';
 
   get nomComplet(): string { return this.authService.getNomComplet(); }
+  get isProprietaire(): boolean { return this.authService.getUserRole() === 'PROPRIETAIRE'; }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -80,7 +81,11 @@ export class CreateCompteurComponent implements OnInit {
       next: () => {
         this.isLoading = false;
         this.toast.success('Compteur enregistré avec succès !');
-        this.router.navigate(['/onboarding/mode-lecture']);
+        if (this.isProprietaire) {
+          this.router.navigate(['/onboarding/maison']);
+        } else {
+          this.router.navigate(['/onboarding/mode-lecture']);
+        }
       },
       error: (err: Error) => {
         this.isLoading    = false;

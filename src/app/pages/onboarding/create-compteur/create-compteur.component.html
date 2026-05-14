@@ -25,14 +25,18 @@
       <span class="onb-step-label">Compteur</span>
     </div>
     <div class="onb-step-line"></div>
+
+    @if (isProprietaire) {
+      <div class="onb-step">
+        <div class="onb-step-num">2</div>
+        <span class="onb-step-label">Ma maison</span>
+      </div>
+      <div class="onb-step-line"></div>
+    }
+
     <div class="onb-step">
-      <div class="onb-step-num">2</div>
-      <span class="onb-step-label">Mode de lecture</span>
-    </div>
-    <div class="onb-step-line"></div>
-    <div class="onb-step">
-      <div class="onb-step-num">3</div>
-      <span class="onb-step-label">Dashboard</span>
+      <div class="onb-step-num">{{ isProprietaire ? '3' : '2' }}</div>
+      <span class="onb-step-label">Mode lecture</span>
     </div>
   </div>
 </div>

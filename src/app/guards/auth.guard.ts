@@ -25,13 +25,18 @@ export const redirectIfLoggedInGuard: CanActivateFn = () => {
   const router      = inject(Router);
 
   if (authService.isLoggedIn()) {
-    const type = localStorage.getItem(STORAGE_KEYS.typeCompteur);
-    if (type === 'CASH_POWER') {
-      router.navigate(['/dashboard/cashpower']);
-    } else if (type === 'CLASSIQUE') {
-      router.navigate(['/dashboard/classique']);
+    const role = authService.getUserRole();
+    if (role === 'PROPRIETAIRE') {
+      router.navigate(['/dashboard/proprietaire']);
     } else {
-      router.navigate(['/onboarding/compteur']);
+      const type = localStorage.getItem(STORAGE_KEYS.typeCompteur);
+      if (type === 'CASH_POWER') {
+        router.navigate(['/dashboard/cashpower']);
+      } else if (type === 'CLASSIQUE') {
+        router.navigate(['/dashboard/classique']);
+      } else {
+        router.navigate(['/onboarding/compteur']);
+      }
     }
     return false;
   }
