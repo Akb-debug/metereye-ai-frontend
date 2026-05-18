@@ -71,10 +71,11 @@ export const API_URLS = {
 };
 
 export const STORAGE_KEYS = {
-  token:        'metereye_token',
-  role:         'metereye_role',
-  nomComplet:   'metereye_nom',
-  userId:       'metereye_userId',
-  compteurId:   'metereye_compteurId',
-  typeCompteur: 'metereye_typeCompteur',
+  token:          'metereye_token',
+  role:           'metereye_role',
+  nomComplet:     'metereye_nom',
+  userId:         'metereye_userId',
+  compteurId:     'metereye_compteurId',
+  typeCompteur:   'metereye_typeCompteur',
+  sousCompteurId: 'metereye_sousCompteurId',
 };

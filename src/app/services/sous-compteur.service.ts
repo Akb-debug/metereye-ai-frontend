@@ -40,6 +40,16 @@ export class SousCompteurService {
     );
   }
 
+  getMesSousCompteurs(): Observable<SousCompteurResponse[]> {
+    return this.http.get<ApiResponse<SousCompteurResponse[]>>(API_URLS.sousCompteurs)
+      .pipe(map(r => (Array.isArray(r.data) ? r.data : [])));
+  }
+
+  getSousCompteur(id: number): Observable<SousCompteurResponse> {
+    return this.http.get<ApiResponse<SousCompteurResponse>>(API_URLS.sousCompteur(id))
+      .pipe(map(r => r.data));
+  }
+
   getMonSousCompteur(locataireId: number): Observable<SousCompteurResponse> {
     return this.http.get<ApiResponse<SousCompteurResponse>>(
       `${API_URLS.sousCompteurs}/locataires/${locataireId}`

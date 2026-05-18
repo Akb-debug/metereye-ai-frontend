@@ -36,15 +36,24 @@ import { catchError, throwError, of } from 'rxjs';
 import { STORAGE_KEYS } from '../config/app.config.api';
 
 // Liste des URLs qui N'ont PAS besoin du token JWT
-// Ces routes sont publiques — le backend les accepte sans authentification
 const PUBLIC_URLS: string[] = [
   '/auth/login',
   '/auth/register',
 ];
 
-// Vérifie si une URL est publique (pas besoin de token)
+// Ces URLs peuvent retourner 401 sans que cela signifie une vraie expiration de session.
+// Un 401 ici = endpoint optionnel ou accès refusé pour ce rôle, pas une session expirée.
+const SOFT_URLS: string[] = [
+  '/sous-compteurs/locataires/',
+  '/sous-compteurs',              // Locataire n'a peut-être pas accès au listing global
+];
+
 function isPublicUrl(url: string): boolean {
-  return PUBLIC_URLS.some(publicUrl => url.includes(publicUrl));
+  return PUBLIC_URLS.some(u => url.includes(u));
+}
+
+function isSoftUrl(url: string): boolean {
+  return SOFT_URLS.some(u => url.includes(u));
 }
 
 // L'intercepteur — fonction pure (style Standalone Angular)
@@ -85,15 +94,14 @@ export const authInterceptor: HttpInterceptorFn = (
     catchError((error: HttpErrorResponse) => {
 
       // Si le backend répond 401 = token expiré ou invalide
-      if (error.status === 401) {
+      // (ne pas déclencher sur les endpoints optionnels)
+      if (error.status === 401 && !isSoftUrl(req.url)) {
         console.warn('Token expiré ou invalide — déconnexion automatique');
 
-        // Nettoyer toutes les données de session
         Object.values(STORAGE_KEYS).forEach(key => {
           localStorage.removeItem(key);
         });
 
-        // Rediriger vers la page de connexion
         router.navigate(['/auth/login'], {
           queryParams: { reason: 'session_expiree' }
         });

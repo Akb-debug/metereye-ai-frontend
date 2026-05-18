@@ -1,10 +1,11 @@
 // 🔄 MODIFIÉ — user.model.ts — corrections: AuthResponse champs nomComplet/userId alignés backend
 
 export interface AuthResponse {
-  token:     string;
-  role:      string;
-  nomComplet: string;
-  userId:    number;
+  token:           string;
+  role:            string;
+  nomComplet:      string;
+  userId:          number;
+  sousCompteurId?: number;  // Renvoyé par le backend pour les LOCATAIRES
 }
 
 export interface LoginRequest {

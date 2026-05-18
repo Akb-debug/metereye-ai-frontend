@@ -66,6 +66,11 @@ export class AuthService {
     return id ? +id : null;
   }
 
+  getSousCompteurId(): number | null {
+    const id = localStorage.getItem(STORAGE_KEYS.sousCompteurId);
+    return id ? +id : null;
+  }
+
   getNomComplet(): string {
     return localStorage.getItem(STORAGE_KEYS.nomComplet) ?? 'Utilisateur';
   }
@@ -79,6 +84,9 @@ export class AuthService {
     localStorage.setItem(STORAGE_KEYS.role,       r.role  ?? '');
     localStorage.setItem(STORAGE_KEYS.nomComplet, r.nomComplet ?? '');
     localStorage.setItem(STORAGE_KEYS.userId,     String(r.userId ?? 0));
+    if (r.sousCompteurId) {
+      localStorage.setItem(STORAGE_KEYS.sousCompteurId, String(r.sousCompteurId));
+    }
 
     this.userStateSubject.next({ isLoggedIn: true, user: r });
   }

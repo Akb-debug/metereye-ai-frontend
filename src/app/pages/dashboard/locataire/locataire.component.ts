@@ -9,8 +9,10 @@ import { FacturationService } from '../../../services/facturation.service';
 import { ToastService } from '../../../services/toast.service';
 import { SousCompteurResponse } from '../../../models/sous-compteur.model';
 import { AlerteResponse } from '../../../models/alerte.model';
-import { catchError } from 'rxjs/operators';
+import { catchError, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { CompteurService } from '../../../services/compteur.service';
+import { STORAGE_KEYS } from '../../../config/app.config.api';
 
 @Component({
   selector: 'app-locataire',
@@ -21,6 +23,7 @@ import { of } from 'rxjs';
 })
 export class LocataireComponent implements OnInit {
   private authService          = inject(AuthService);
+  private compteurService      = inject(CompteurService);
   private sousCompteurService  = inject(SousCompteurService);
   private alerteService        = inject(AlerteService);
   private facturationService   = inject(FacturationService);
@@ -46,17 +49,69 @@ export class LocataireComponent implements OnInit {
   loadSousCompteur(): void {
     this.isLoading.set(true);
     const userId = this.authService.getUserId();
-    if (!userId) {
-      this.isLoading.set(false);
+
+    // Stratégie 1 : ID mis en cache — si l'appel échoue, on vide le cache
+    //   et on enchaîne sur les stratégies suivantes (évite de rester bloqué sur un ID périmé).
+    const cachedId = this.authService.getSousCompteurId();
+    if (cachedId) {
+      this.sousCompteurService.getSousCompteur(cachedId).pipe(
+        catchError(() => {
+          localStorage.removeItem(STORAGE_KEYS.sousCompteurId);
+          return of(null);
+        })
+      ).subscribe(sc => {
+        if (sc) { this.sousCompteur.set(sc); this.isLoading.set(false); return; }
+        this.discoverSousCompteur(userId);
+      });
       return;
     }
 
-    this.sousCompteurService.getMonSousCompteur(userId)
-      .pipe(catchError(() => of(null)))
-      .subscribe(sc => {
-        this.sousCompteur.set(sc);
-        this.isLoading.set(false);
-      });
+    this.discoverSousCompteur(userId);
+  }
+
+  private discoverSousCompteur(userId: number | null): void {
+    // Stratégie 2 : /auth/me peut inclure sousCompteurId pour les LOCATAIRES
+    this.authService.getMe().pipe(
+      catchError(() => of(null)),
+      switchMap((profile: any) => {
+        if (profile?.sousCompteurId) {
+          localStorage.setItem(STORAGE_KEYS.sousCompteurId, String(profile.sousCompteurId));
+          return this.sousCompteurService.getSousCompteur(profile.sousCompteurId)
+            .pipe(catchError(() => of(null)));
+        }
+        // Stratégie 3 : GET /api/compteurs peut renvoyer l'additionneuse comme pseudo-compteur
+        return this.compteurService.getMesCompteurs().pipe(
+          catchError(() => of([])),
+          switchMap((compteurs: any[]) => {
+            if (compteurs.length > 0 && compteurs[0]?.id) {
+              return this.sousCompteurService.getSousCompteur(compteurs[0].id)
+                .pipe(catchError(() => of(null)));
+            }
+            // Stratégie 4 : listing global filtré côté client (SOFT_URL)
+            return this.sousCompteurService.getMesSousCompteurs().pipe(
+              catchError(() => of([])),
+              switchMap((liste: any[]) => {
+                const match = liste.find((s: any) => s.locataireId === userId) ?? (liste.length === 1 ? liste[0] : null);
+                if (match?.id) {
+                  return this.sousCompteurService.getSousCompteur(match.id)
+                    .pipe(catchError(() => of(null)));
+                }
+                // Stratégie 5 : endpoint dédié locataire (SOFT_URL)
+                if (!userId) return of(null);
+                return this.sousCompteurService.getMonSousCompteur(userId)
+                  .pipe(catchError(() => of(null)));
+              })
+            );
+          })
+        );
+      })
+    ).subscribe(sc => {
+      if (sc?.id) {
+        localStorage.setItem(STORAGE_KEYS.sousCompteurId, String(sc.id));
+      }
+      this.sousCompteur.set(sc);
+      this.isLoading.set(false);
+    });
   }
 
   loadAlertes(): void {
