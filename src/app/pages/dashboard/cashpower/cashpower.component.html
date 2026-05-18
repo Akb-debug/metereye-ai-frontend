@@ -351,34 +351,61 @@
   <div class="modal-overlay" (click.self)="fermerModal()">
     <div class="modal-box">
       <div class="modal-header">
-        <h3>Ajouter un relevé</h3>
+        <div class="modal-title-wrap">
+          <div class="modal-icon-badge modal-icon-badge--yellow">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+          </div>
+          <div>
+            <h3>Recharger des unités</h3>
+            <p class="modal-subtitle">Compteur Cash Power (crédit kWh)</p>
+          </div>
+        </div>
         <button class="btn-close" (click)="fermerModal()">
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
           </svg>
         </button>
       </div>
-      <form [formGroup]="releveForm" (ngSubmit)="ajouterReleve()" style="padding:20px 24px">
+
+      <form [formGroup]="releveForm" (ngSubmit)="ajouterReleve()" class="modal-form-body">
         <div class="form-group">
-          <label>Valeur du compteur (kWh)</label>
-          <input type="number" class="form-control" formControlName="value"
-            [class.is-invalid]="rf['value'].invalid && rf['value'].touched"
-            placeholder="Ex : 45.8" step="0.1" min="0"/>
+          <label>Crédit rechargé (kWh)</label>
+          <div class="field-wrap">
+            <svg class="field-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            </svg>
+            <input type="number" class="form-control"
+              formControlName="value"
+              [class.is-invalid]="rf['value'].invalid && rf['value'].touched"
+              placeholder="Ex : 45.8" step="0.1" min="0"/>
+          </div>
           @if (rf['value'].invalid && rf['value'].touched) {
             <span class="error-msg">Valeur requise (≥ 0).</span>
           }
+          <span class="help-text">Entrez le crédit kWh affiché après la recharge</span>
         </div>
+
         @if (errorMessage) {
-          <div style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--color-danger-light);border-radius:var(--radius-sm);font-size:13px;color:var(--color-danger);margin-bottom:16px">
-            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/></svg>
+          <div class="field-alert field-alert--danger">
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01"/>
+            </svg>
             {{ errorMessage }}
           </div>
         }
+
         <div class="modal-footer">
           <button type="button" class="btn btn-outline" (click)="fermerModal()">Annuler</button>
-          <button type="submit" class="btn btn-primary" [disabled]="isSaving">
-            @if (isSaving) { <span class="btn-spinner"></span> Enregistrement... }
-            @else { Enregistrer }
+          <button type="submit" class="btn btn-primary modal-submit" [disabled]="isSaving">
+            @if (isSaving) { <span class="btn-spinner"></span> Enregistrement… }
+            @else {
+              <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+              Enregistrer
+            }
           </button>
         </div>
       </form>

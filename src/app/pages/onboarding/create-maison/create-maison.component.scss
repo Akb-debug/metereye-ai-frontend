@@ -1,171 +1,89 @@
-// ─── Top nav ───────────────────────────────────────────────────────────────
-.onb-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 32px;
-  height: 56px;
-  background: #fff;
+// .field-wrap, .field-alert, .submit-btn, .btn-spinner → styles.scss
+
+.onb-card { box-shadow: var(--shadow-md); }
+
+.onb-card-header {
+  margin-bottom: 28px;
+  padding-bottom: 20px;
   border-bottom: 1px solid var(--color-border);
-  position: sticky;
-  top: 0;
-  z-index: 10;
 }
 
-.onb-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 17px;
-  font-weight: 600;
-  color: var(--color-dark);
-  strong { color: var(--color-primary); font-weight: 700; }
-}
+.onb-title  { font-size: 22px; font-weight: 700; color: var(--color-dark); margin: 0 0 6px; }
+.onb-subtitle { font-size: 14px; color: var(--color-text-light); margin: 0; }
 
-.logo-icon {
-  width: 32px; height: 32px;
-  background: var(--color-primary);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+.form-group { margin-bottom: 20px; }
 
-.onb-user {
-  font-size: 13px;
-  color: var(--color-text-light);
-  strong { color: var(--color-dark); font-weight: 600; }
-}
-
-.sep { margin: 0 6px; color: var(--color-text-muted); }
-
-.btn-link {
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--color-primary);
-  font-weight: 500;
-  &:hover { text-decoration: underline; }
-}
-
-// ─── Stepper ────────────────────────────────────────────────────────────────
-.onb-stepper-wrap {
-  display: flex;
-  justify-content: center;
-  padding: 28px 16px 0;
-  background: var(--color-bg);
-}
-
-.onb-stepper {
-  display: flex;
-  align-items: center;
-}
-
-.onb-step {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.onb-step-num {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  border: 2px solid var(--color-border);
-  background: #fff;
+.label-optional {
+  font-size: 12px;
   color: var(--color-text-muted);
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition);
+  font-weight: 400;
+  margin-left: 4px;
+}
 
-  .onb-step.active & {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
-    color: #fff;
+// Textarea avec icône
+.textarea-wrap {
+  position: relative;
+
+  .textarea-icon {
+    position: absolute;
+    left: 14px;
+    top: 13px;
+    color: var(--color-text-muted);
+    pointer-events: none;
+    transition: color var(--transition);
+    z-index: 1;
+  }
+
+  &:focus-within .textarea-icon { color: var(--color-primary); }
+
+  .form-control {
+    padding-left: 42px;
+    padding-top: 12px;
+    border-radius: 12px;
+    resize: vertical;
+    min-height: 90px;
+    transition: border-color var(--transition), box-shadow var(--transition);
+
+    &:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(26,115,232,.12);
+      outline: none;
+    }
   }
 }
 
-.onb-step-label {
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  .onb-step.active & {
-    color: var(--color-dark);
-    font-weight: 600;
-  }
-}
-
-.onb-step-line {
-  width: 60px;
-  height: 2px;
-  background: var(--color-border);
-  margin: 0 12px;
-}
-
-// ─── Page + card ────────────────────────────────────────────────────────────
-.onb-page {
-  min-height: calc(100vh - 56px - 76px);
-  background: var(--color-bg);
-  display: flex;
-  justify-content: center;
-  padding: 32px 16px 48px;
-}
-
-.onb-card {
-  width: 100%;
-  max-width: 640px;
-  background: #fff;
-  border-radius: var(--radius-lg);
-  box-shadow: 0 1px 4px rgba(0,0,0,.08);
-  padding: 36px 40px 32px;
-}
-
-.onb-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--color-dark);
-  margin: 0 0 6px;
-}
-
-.onb-subtitle {
-  font-size: 14px;
-  color: var(--color-text-light);
-  margin: 0 0 28px;
-}
-
-.text-primary { color: var(--color-primary); }
-
-// ─── Footer actions ──────────────────────────────────────────────────────────
 .onb-actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 24px;
+  margin-top: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
 }
 
 .btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
   font-size: 14px;
+  font-family: inherit;
   color: var(--color-text-light);
   font-weight: 500;
+  transition: color var(--transition);
   &:hover { color: var(--color-dark); }
 }
 
-.btn-spinner {
-  width: 16px; height: 16px;
-  border: 2px solid rgba(255,255,255,.4);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
-  display: inline-block;
-  margin-right: 4px;
-  vertical-align: middle;
+.onb-submit { height: 44px; margin-top: 0; min-width: 160px; }
+
+.btn-link {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-size: 13px; font-family: inherit;
+  color: var(--color-primary); font-weight: 500;
+  &:hover { text-decoration: underline; }
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+
+.sep { margin: 0 6px; color: var(--color-text-muted); }

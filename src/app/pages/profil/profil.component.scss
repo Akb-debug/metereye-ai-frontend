@@ -16,6 +16,8 @@
 .profil-aside {
   position: sticky;
   top: 20px;
+
+  @media (max-width: 900px) { position: static; }
 }
 
 .aside-card {
@@ -388,18 +390,152 @@
 .badge-success { background: #D1FAE5; color: #065F46; }
 .badge-muted  { background: #F3F4F6; color: #374151; }
 
-/* ── Spinner ──────────────────────────────────────────────── */
+/* ── Section header with icon ─────────────────────────────── */
 
-.btn-spinner {
-  width: 13px;
-  height: 13px;
-  border: 2px solid rgba(255, 255, 255, .4);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
-  display: inline-block;
-  margin-right: 4px;
-  vertical-align: middle;
+.section-hdr-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
 }
 
-@keyframes spin { to { transform: rotate(360deg); } }
+.section-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &.si-blue    { background: #DBEAFE; color: #2563EB; }
+  &.si-orange  { background: #FFEDD5; color: #EA580C; }
+  &.si-warning { background: #FEF3C7; color: #D97706; }
+}
+
+/* ── Profil grid ──────────────────────────────────────────── */
+
+.profil-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Profil phone field ───────────────────────────────────── */
+
+.profil-phone-wrap {
+  display: flex;
+  height: 48px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+
+  &:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.12);
+  }
+}
+
+.profil-phone-prefix {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  background: #F9FAFB;
+  border-right: 1.5px solid var(--color-border);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.profil-phone-code {
+  font-size: 13.5px;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.profil-phone-input {
+  flex: 1;
+  border: none !important;
+  border-radius: 0 !important;
+  height: 100% !important;
+  box-shadow: none !important;
+  padding-left: 14px !important;
+
+  &:focus {
+    box-shadow: none !important;
+    border-color: transparent !important;
+  }
+}
+
+/* ── Seuil input wrap ─────────────────────────────────────── */
+
+.seuil-wrap {
+  display: flex;
+  height: 48px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: box-shadow 0.2s, border-color 0.2s;
+
+  &:focus-within {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.12);
+  }
+}
+
+.seuil-icon {
+  width: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #EFF6FF;
+  color: #3B82F6;
+  flex-shrink: 0;
+  border-right: 1.5px solid var(--color-border);
+
+  &.seuil-icon--warning {
+    background: #FEF3C7;
+    color: #D97706;
+  }
+}
+
+.seuil-input {
+  flex: 1;
+  border: none !important;
+  border-radius: 0 !important;
+  height: 100% !important;
+  box-shadow: none !important;
+  padding-left: 12px !important;
+
+  &:focus {
+    box-shadow: none !important;
+    border-color: transparent !important;
+  }
+}
+
+.seuil-sfx {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  background: #F3F4F6;
+  border-left: 1.5px solid var(--color-border);
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ── Section save button ──────────────────────────────────── */
+
+.section-save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 40px;
+  padding: 0 20px;
+  font-size: 14px;
+}

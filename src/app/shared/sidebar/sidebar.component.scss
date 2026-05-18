@@ -160,3 +160,85 @@
     .nav-icon { color: #DC2626; }
   }
 }
+
+/* ── Navigation mobile bas d'écran ── */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #fff;
+  border-top: 1px solid #E2E8F0;
+  z-index: 200;
+  flex-direction: row;
+  align-items: stretch;
+  box-shadow: 0 -4px 16px rgba(0,0,0,.06);
+
+  @media (max-width: 576px) { display: flex; }
+}
+
+.mnav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: #94A3B8;
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 500;
+  transition: color 0.15s;
+
+  &.mnav-active,
+  &:hover { color: #2563EB; }
+}
+
+/* ── Icônes seulement ≤768px ── */
+@media (max-width: 768px) {
+  .sidebar {
+    padding: 20px 8px;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .sidebar-logo {
+    padding: 0 0 20px;
+    justify-content: center;
+    gap: 0;
+
+    .logo-text { display: none; }
+  }
+
+  .sidebar-user {
+    padding: 8px;
+    justify-content: center;
+    gap: 0;
+
+    .user-details { display: none; }
+  }
+
+  .nav-item {
+    padding: 12px;
+    justify-content: center;
+    gap: 0;
+
+    span { display: none; }
+    .nav-badge-pill { display: none; }
+  }
+
+  .nav-icon {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* ── Sidebar cachée ≤576px ── */
+@media (max-width: 576px) {
+  :host {
+    transform: translateX(-100%);
+    pointer-events: none;
+  }
+}

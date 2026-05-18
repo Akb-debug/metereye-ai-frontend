@@ -1,25 +1,55 @@
-// ✅ CRÉÉ — config-esp32.component.scss
+// .field-wrap, .field-alert, .submit-btn, .btn-spinner → styles.scss
 
+.onb-card { box-shadow: var(--shadow-md); }
+
+.onb-card-header {
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.onb-title  { font-size: 22px; font-weight: 700; color: var(--color-dark); margin: 0 0 6px; }
+.onb-subtitle { font-size: 14px; color: var(--color-text-light); margin: 0; }
+
+.device-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 12px;
+}
+
+// Sections numérotées
 .config-section {
-  background: var(--color-bg);
+  background: #F9FAFB;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: 20px;
   margin-bottom: 16px;
-  border: 1px solid var(--color-border);
+
+  &--done {
+    background: #F0FDF4;
+    border-color: #BBF7D0;
+  }
 }
 
 .section-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
   font-weight: 600;
   font-size: 14px;
   color: var(--color-dark);
 }
 
 .section-num {
-  width: 26px; height: 26px;
+  width: 28px; height: 28px;
   border-radius: 50%;
   background: var(--color-primary);
   color: #fff;
@@ -33,13 +63,102 @@
   &.done { background: var(--color-success); }
 }
 
-.input-row {
-  display: flex;
-  gap: 10px;
-
-  .form-control { flex: 1; }
-  button { flex-shrink: 0; }
+.badge-detected {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-success-light);
+  color: var(--color-success);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 20px;
 }
 
-.btn-spinner { width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;display:inline-block;margin-right:4px; }
-@keyframes spin { to { transform:rotate(360deg); } }
+.label-optional {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.form-group { margin-bottom: 16px; }
+
+.scan-action {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+}
+
+// Info carte module détecté
+.device-info-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: var(--color-success-light);
+  border: 1px solid #BBF7D0;
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.device-info-icon {
+  width: 36px; height: 36px;
+  background: var(--color-success);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.device-info-name {
+  font-size: 14px;
+  color: #166534;
+  margin: 0 0 3px;
+  strong { font-weight: 700; }
+}
+
+.device-info-status {
+  font-size: 12px;
+  color: #15803D;
+  margin: 0;
+}
+
+.onb-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-border);
+}
+
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-size: 14px; font-family: inherit;
+  color: var(--color-text-light); font-weight: 500;
+  transition: color var(--transition);
+  &:hover { color: var(--color-dark); }
+}
+
+.onb-submit { height: 44px; margin-top: 0; min-width: 160px; }
+
+.btn-link {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-size: 13px; font-family: inherit;
+  color: var(--color-primary); font-weight: 500;
+  &:hover { text-decoration: underline; }
+}
+
+.sep { margin: 0 6px; color: var(--color-text-muted); }
+
+// Spinner coloré pour btn-outline
+.btn-spinner--primary {
+  border-color: var(--color-primary);
+  border-top-color: transparent;
+}

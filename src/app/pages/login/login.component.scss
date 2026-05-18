@@ -1,32 +1,13 @@
-// ✅ CRÉÉ — login.component.scss
+// Surcharges spécifiques à la page login
+// Le layout split et les utilitaires de champs sont définis dans styles.scss
 
-.input-group {
-  position: relative;
-  display: flex;
-  align-items: center;
+.form-group {
+  margin-bottom: 20px;
 
-  .form-control { padding-right: 44px; }
-
-  .btn-eye {
-    position: absolute;
-    right: 12px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: var(--color-text-muted);
-    display: flex;
-    padding: 4px;
-    &:hover { color: var(--color-text); }
+  label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--color-dark);
+    margin-bottom: 8px;
   }
 }
-
-.btn-spinner {
-  width: 16px; height: 16px;
-  border: 2px solid rgba(255,255,255,.4);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
-  display: inline-block;
-  margin-right: 4px;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
