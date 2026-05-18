@@ -50,7 +50,18 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem(STORAGE_KEYS.token);
+    const token = localStorage.getItem(STORAGE_KEYS.token);
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp && Date.now() / 1000 >= payload.exp) {
+        Object.values(STORAGE_KEYS).forEach(k => localStorage.removeItem(k));
+        return false;
+      }
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   getToken(): string | null {

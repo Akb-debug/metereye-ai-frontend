@@ -165,26 +165,22 @@
             Locataires concernés
           </label>
           <div class="checkbox-list">
-            @for (item of data()?.items; track item.reference) {
-              <label class="checkbox-item">
-                <input type="checkbox" checked class="custom-checkbox"/>
-                <div class="checkbox-info">
-                  <span class="checkbox-name">{{ item.locataireNom }}</span>
-                  <span class="checkbox-ref">{{ item.reference }}</span>
-                </div>
-              </label>
             @if (data()?.items && data()!.items.length > 0) {
               @for (item of data()?.items; track item.reference) {
                 <label class="checkbox-item" [class.disabled]="item.statut === 'GENEREE'">
-                  <input type="checkbox" 
-                         [checked]="item.locataireId && selectedLocatairesIds.includes(item.locataireId)" 
+                  <input type="checkbox"
+                         [checked]="item.locataireId && selectedLocatairesIds.includes(item.locataireId)"
                          (change)="toggleLocataire(item.locataireId, $event)"
                          [disabled]="item.statut === 'GENEREE'"
                          class="custom-checkbox" />
-                  <span>
-                    {{ item.locataireNom }} ({{ item.reference }}) 
-                    <span *ngIf="item.statut === 'GENEREE'" style="font-size: 0.8rem; color: #10b981; margin-left: 5px;">(Déjà générée)</span>
-                  </span>
+                  <div class="checkbox-info">
+                    <span class="checkbox-name">{{ item.locataireNom }}</span>
+                    <span class="checkbox-ref">{{ item.reference }}
+                      @if (item.statut === 'GENEREE') {
+                        <span class="generated-tag">Déjà générée</span>
+                      }
+                    </span>
+                  </div>
                 </label>
               }
             } @else {

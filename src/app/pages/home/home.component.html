@@ -11,8 +11,12 @@
     <span>MeterEye AI</span>
   </div>
   <div class="lp-nav-links">
-    <a routerLink="/auth/login"    class="btn btn-outline">Se connecter</a>
-    <a routerLink="/auth/register" class="btn btn-primary">Créer un compte</a>
+    @if (isLoggedIn) {
+      <a [routerLink]="dashboardUrl" class="btn btn-primary">Mon tableau de bord</a>
+    } @else {
+      <a routerLink="/auth/login"    class="btn btn-outline">Se connecter</a>
+      <a routerLink="/auth/register" class="btn btn-primary">Créer un compte</a>
+    }
   </div>
 </nav>
 
