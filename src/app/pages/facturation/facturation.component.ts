@@ -6,6 +6,7 @@ import { MaisonService } from '../../services/maison.service';
 import { ToastService } from '../../services/toast.service';
 import { ToastComponent } from '../../shared/toast/toast.component';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-facturation',
@@ -30,6 +31,7 @@ export class FacturationComponent implements OnInit {
   currentAnnee = new Date().getFullYear();
 
   genForm!: FormGroup;
+  selectedLocatairesIds: number[] = [];
 
   moisList = [
     { value: 1, label: 'Janvier' }, { value: 2, label: 'Février' }, { value: 3, label: 'Mars' },
@@ -45,8 +47,17 @@ export class FacturationComponent implements OnInit {
 
   initForm(): void {
     this.genForm = this.fb.group({
-      montant: [19600, [Validators.required, Validators.min(0)]],
+      montant: [0, [Validators.required, Validators.min(0)]],
       locatairesSelectionnes: [[]] // On gère manuellement les checkboxes pour plus de flexibilité
+    });
+
+    this.genForm.get('montant')?.valueChanges.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(val => {
+      if (val !== null && val >= 0 && this.isModalOpen()) {
+        this.loadApercu(val);
+      }
     });
   }
 
@@ -85,6 +96,15 @@ export class FacturationComponent implements OnInit {
     this.facturationService.getApercu(this.maisonId, this.currentMois, this.currentAnnee, montant).subscribe({
       next: (res) => {
         this.data.set(res);
+        
+        // Mettre à jour la sélection par défaut si la modale est ouverte
+        if (this.isModalOpen()) {
+          const items = res.items || [];
+          this.selectedLocatairesIds = items
+            .filter(i => i.statut !== 'GENEREE' && i.locataireId)
+            .map(i => i.locataireId!);
+        }
+        
         this.isLoading.set(false);
       },
       error: () => this.isLoading.set(false)
@@ -92,7 +112,26 @@ export class FacturationComponent implements OnInit {
   }
 
   openModal(): void {
+    const currentMontant = this.data()?.montantFacturePrincipale || 0;
+    this.genForm.patchValue({ montant: currentMontant }, { emitEvent: false });
+    
+    const items = this.data()?.items || [];
+    this.selectedLocatairesIds = items
+      .filter(i => i.statut !== 'GENEREE' && i.locataireId)
+      .map(i => i.locataireId!);
+      
     this.isModalOpen.set(true);
+  }
+
+  toggleLocataire(id: number | undefined, event: any): void {
+    if (!id) return;
+    if (event.target.checked) {
+      if (!this.selectedLocatairesIds.includes(id)) {
+        this.selectedLocatairesIds.push(id);
+      }
+    } else {
+      this.selectedLocatairesIds = this.selectedLocatairesIds.filter(x => x !== id);
+    }
   }
 
   closeModal(): void {
@@ -108,7 +147,7 @@ export class FacturationComponent implements OnInit {
       mois: this.currentMois,
       annee: this.currentAnnee,
       montantFacturePrincipale: this.genForm.value.montant,
-      locatairesIds: [] // Dans un vrai cas, on mapperait les checkboxes
+      locatairesIds: this.selectedLocatairesIds
     };
 
     this.facturationService.genererFactures(req).subscribe({
@@ -127,5 +166,29 @@ export class FacturationComponent implements OnInit {
 
   getLabelMois(m: number): string {
     return this.moisList.find(x => x.value === m)?.label || '';
+  }
+
+  telechargerFacture(factureId?: number): void {
+    if (!factureId) return;
+    this.facturationService.telechargerFacture(factureId).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Facture_${factureId}.pdf`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => this.toast.error('Erreur lors du téléchargement')
+    });
+  }
+
+  telechargerTout(): void {
+    const items = this.data()?.items?.filter(i => i.statut === 'GENEREE' && i.factureId) || [];
+    if (items.length === 0) {
+      this.toast.error('Aucune facture générée à télécharger');
+      return;
+    }
+    items.forEach(item => this.telechargerFacture(item.factureId));
   }
 }

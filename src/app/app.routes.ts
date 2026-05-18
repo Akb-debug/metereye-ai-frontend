@@ -3,7 +3,7 @@
 // 🔄 MODIFIÉ — app.routes.ts — routes complètes profil PERSONNEL avec lazy loading
 
 import { Routes } from '@angular/router';
-import { authGuard, redirectIfLoggedInGuard } from './guards/auth.guard';
+import { authGuard, redirectIfLoggedInGuard, proprietaireGuard, locataireGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
 
@@ -30,19 +30,19 @@ export const routes: Routes = [
 
   {
     path: 'maison',
-    canActivate: [authGuard],
+    canActivate: [proprietaireGuard],
     loadComponent: () => import('./pages/maison/maison.component').then(m => m.MaisonComponent),
     title: 'Ma maison — MeterEye AI'
   },
   {
     path: 'locataires',
-    canActivate: [authGuard],
+    canActivate: [proprietaireGuard],
     loadComponent: () => import('./pages/locataires/locataires.component').then(m => m.LocatairesComponent),
     title: 'Mes locataires — MeterEye AI'
   },
   {
     path: 'facturation',
-    canActivate: [authGuard],
+    canActivate: [proprietaireGuard],
     loadComponent: () => import('./pages/facturation/facturation.component').then(m => m.FacturationComponent),
     title: 'Facturation — MeterEye AI'
   },
@@ -85,32 +85,31 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard/cashpower',
-    canActivate: [authGuard],
+    canActivate: [proprietaireGuard],
     loadComponent: () => import('./pages/dashboard/cashpower/cashpower.component').then(m => m.CashpowerComponent),
     title: 'Tableau de bord Cash Power — MeterEye AI'
   },
   {
     path: 'dashboard/proprietaire',
-    canActivate: [authGuard],
+    canActivate: [proprietaireGuard],
     loadComponent: () => import('./pages/dashboard/proprietaire/proprietaire.component').then(m => m.ProprietaireComponent),
     title: 'Tableau de bord Propriétaire — MeterEye AI'
   },
   {
     path: 'dashboard/classique',
-    canActivate: [authGuard],
+    canActivate: [proprietaireGuard],
     loadComponent: () => import('./pages/dashboard/classique/classique.component').then(m => m.ClassiqueComponent),
     title: 'Tableau de bord Classique — MeterEye AI'
   },
-
   {
     path: 'dashboard/locataire',
-    canActivate: [authGuard],
+    canActivate: [locataireGuard],
     loadComponent: () => import('./pages/dashboard/locataire/locataire.component').then(m => m.LocataireComponent),
     title: 'Tableau de bord Locataire — MeterEye AI'
   },
   {
     path: 'mes-factures',
-    canActivate: [authGuard],
+    canActivate: [locataireGuard],
     loadComponent: () => import('./pages/locataire-factures/locataire-factures.component').then(m => m.LocataireFacturesComponent),
     title: 'Mes factures — MeterEye AI'
   },

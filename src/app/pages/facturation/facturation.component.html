@@ -15,7 +15,7 @@
         <option value="2025">2025</option>
       </select>
       <button class="btn btn-primary" (click)="openModal()">Générer les factures</button>
-      <button class="btn btn-outline">
+      <button class="btn btn-outline" (click)="telechargerTout()">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
         </svg>
@@ -96,7 +96,7 @@
                 </td>
                 <td class="text-right">
                   @if (item.statut === 'GENEREE') {
-                    <button class="btn-link">
+                    <button class="btn-link" (click)="telechargerFacture(item.factureId)">
                       <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                       </svg>
@@ -138,11 +138,22 @@
         <div class="locataires-selection">
           <label class="section-label">Locataires concernés</label>
           <div class="checkbox-list">
-            @for (item of data()?.items; track item.reference) {
-              <label class="checkbox-item">
-                <input type="checkbox" checked class="custom-checkbox" />
-                <span>{{ item.locataireNom }} ({{ item.reference }})</span>
-              </label>
+            @if (data()?.items && data()!.items.length > 0) {
+              @for (item of data()?.items; track item.reference) {
+                <label class="checkbox-item" [class.disabled]="item.statut === 'GENEREE'">
+                  <input type="checkbox" 
+                         [checked]="item.locataireId && selectedLocatairesIds.includes(item.locataireId)" 
+                         (change)="toggleLocataire(item.locataireId, $event)"
+                         [disabled]="item.statut === 'GENEREE'"
+                         class="custom-checkbox" />
+                  <span>
+                    {{ item.locataireNom }} ({{ item.reference }}) 
+                    <span *ngIf="item.statut === 'GENEREE'" style="font-size: 0.8rem; color: #10b981; margin-left: 5px;">(Déjà générée)</span>
+                  </span>
+                </label>
+              }
+            } @else {
+              <p class="text-muted" style="font-size: 0.9rem; margin-top: 0.5rem;">Aucun locataire trouvé. Veuillez renseigner un montant valide.</p>
             }
           </div>
         </div>

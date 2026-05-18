@@ -306,7 +306,7 @@ export class ClassiqueComponent implements OnInit, OnDestroy {
     const id = this.compteurService.getCompteurIdSauvegarde();
     if (!id) return;
     this.isSaving = true;
-    this.readingService.createReleveManuel({ meterId: id, value: +this.releveForm.value.value, date: new Date().toISOString() }).subscribe({
+    this.readingService.createReleveManuel({ meterId: id, value: +this.releveForm.value.value }).subscribe({
       next: () => { this.toast.success('Relevé enregistré !'); this.fermerModal(); this.chargerTout(); this.isSaving = false; },
       error: (err) => { this.errorMessage = err.message; this.isSaving = false; }
     });

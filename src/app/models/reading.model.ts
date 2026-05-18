@@ -1,5 +1,3 @@
-// 🔄 MODIFIÉ — reading.model.ts — corrections: date au lieu de dateTime, CreateReadingRequest avec date, PagedReadings structure backend
-
 export interface ReadingResponse {
   id:           number;
   meterId?:     number;
@@ -10,18 +8,14 @@ export interface ReadingResponse {
   consumption?: number;
   imageUrl?:    string;
   statut?:      string;
+  comment?:     string;
 }
 
-export interface ManualReadingRequest {
-  meterId: number;
-  value:   number;
-  date:    string;
-}
-
+// Correspond exactement au ManualReadingRequest du backend
 export interface CreateReadingRequest {
-  meterId: number;
-  value:   number;
-  date:    string;
+  meterId:  number;
+  value:    number;
+  comment?: string;
 }
 
 export interface PagedReadings {

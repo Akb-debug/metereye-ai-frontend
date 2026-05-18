@@ -1,2 +1,11 @@
 
+@if (showLayout()) {
+  <app-topbar></app-topbar>
+  <div class="layout-spacer"></div>
+}
+
 <router-outlet></router-outlet>
+
+@if (showLayout()) {
+  <app-footer></app-footer>
+}
