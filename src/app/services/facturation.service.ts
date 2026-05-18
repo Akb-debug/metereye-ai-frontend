@@ -12,6 +12,9 @@ export interface RepartitionItem {
   montant:         number;
   statut:          'GENEREE' | 'EN_ATTENTE';
   factureId?:      number;
+  mois?:           number;
+  annee?:          number;
+  locataireId?:    number;
 }
 
 export interface RepartitionResponse {
@@ -52,5 +55,15 @@ export class FacturationService {
     return this.http.post<ApiResponse<RepartitionResponse>>(API_URLS.repartitionGenerer, req).pipe(
       map(r => r.data)
     );
+  }
+
+  getMesFactures(): Observable<RepartitionItem[]> {
+    return this.http.get<ApiResponse<RepartitionItem[]>>(API_URLS.mesFactures).pipe(
+      map(r => r.data)
+    );
+  }
+
+  telechargerFacture(factureId: number): Observable<Blob> {
+    return this.http.get(API_URLS.telechargerFacture(factureId), { responseType: 'blob' });
   }
 }

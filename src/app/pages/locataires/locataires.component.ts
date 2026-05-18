@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SidebarComponent } from '../../shared/sidebar/sidebar.component';
-import { LocataireService, CreerLocataireRequest } from '../../services/locataire.service';
+import { LocataireService } from '../../services/locataire.service';
 import { MaisonService } from '../../services/maison.service';
 import { SousCompteurService, SousCompteurRequest } from '../../services/sous-compteur.service';
 import { SousCompteurResponse } from '../../models/sous-compteur.model';
@@ -23,17 +23,22 @@ export class LocatairesComponent implements OnInit {
   private toast               = inject(ToastService);
   private fb                  = inject(FormBuilder);
 
-  locataires = signal<SousCompteurResponse[]>([]);
+  locataires             = signal<SousCompteurResponse[]>([]);
   availableSousCompteurs = signal<SousCompteurResponse[]>([]);
-  isLoading  = signal(true);
-  
-  isModalOpen = signal(false);
-  isAddCompteurModalOpen = signal(false);
-  isSubmitting = signal(false);
+  isLoading              = signal(true);
 
+  isModalOpen             = signal(false);
+  isAddCompteurModalOpen  = signal(false);
+  isDetailModalOpen       = signal(false);
+  isEditLocataireModalOpen = signal(false);
+  isSubmitting            = signal(false);
+
+  selectedLocataire = signal<SousCompteurResponse | null>(null);
   maisonId?: number;
-  addForm!: FormGroup;
-  addCompteurForm!: FormGroup;
+
+  addForm!:            FormGroup;
+  addCompteurForm!:    FormGroup;
+  editLocataireForm!:  FormGroup;
 
   ngOnInit(): void {
     this.initForms();
@@ -54,6 +59,11 @@ export class LocatairesComponent implements OnInit {
       reference:           ['', [Validators.required]],
       descriptionLogement: ['', [Validators.required]],
       valeurInitiale:      [0, [Validators.required, Validators.min(0)]]
+    });
+
+    this.editLocataireForm = this.fb.group({
+      reference:           ['', [Validators.required]],
+      descriptionLogement: ['', [Validators.required]]
     });
   }
 
@@ -92,6 +102,7 @@ export class LocatairesComponent implements OnInit {
     });
   }
 
+  // ── Ajouter locataire ──────────────────────────
   openModal(): void {
     this.addForm.reset();
     this.isModalOpen.set(true);
@@ -101,6 +112,32 @@ export class LocatairesComponent implements OnInit {
     this.isModalOpen.set(false);
   }
 
+  onSubmit(): void {
+    if (this.addForm.invalid) return;
+    this.isSubmitting.set(true);
+    const req = {
+      nom:                  this.addForm.value.nom,
+      prenom:               this.addForm.value.prenom,
+      email:                this.addForm.value.email,
+      telephone:            this.addForm.value.telephone,
+      sousCompteurId:       Number(this.addForm.value.sousCompteurId),
+      motDePasseTemporaire: this.addForm.value.motDePasseTemp
+    };
+    this.locataireService.creerLocataire(req).subscribe({
+      next: () => {
+        this.toast.success('Locataire créé avec succès !');
+        this.isSubmitting.set(false);
+        this.closeModal();
+        this.loadData();
+      },
+      error: (err) => {
+        this.toast.error(err?.error?.message || 'Erreur lors de la création');
+        this.isSubmitting.set(false);
+      }
+    });
+  }
+
+  // ── Ajouter additionneuse ──────────────────────
   openAddCompteurModal(): void {
     this.addCompteurForm.reset({ valeurInitiale: 0 });
     this.isAddCompteurModalOpen.set(true);
@@ -110,55 +147,65 @@ export class LocatairesComponent implements OnInit {
     this.isAddCompteurModalOpen.set(false);
   }
 
-  onSubmit(): void {
-    if (this.addForm.invalid) return;
-    this.isSubmitting.set(true);
-
-    const req = {
-      nom:            this.addForm.value.nom,
-      prenom:         this.addForm.value.prenom,
-      email:          this.addForm.value.email,
-      telephone:      this.addForm.value.telephone,
-      sousCompteurId: Number(this.addForm.value.sousCompteurId),
-      motDePasseTemporaire: this.addForm.value.motDePasseTemp
-    };
-    this.locataireService.creerLocataire(req).subscribe({
-      next: () => {
-        this.toast.success('Locataire créé avec succès !');
-        this.isSubmitting.set(false);
-        this.closeModal();
-        this.loadData(); // Recharger tout car les compteurs libres ont changé
-      },
-      error: (err) => {
-        this.toast.error(err?.message || 'Erreur lors de la création');
-        this.isSubmitting.set(false);
-      }
-    });
-  }
-
   onSubmitCompteur(): void {
     if (this.addCompteurForm.invalid || !this.maisonId) return;
     this.isSubmitting.set(true);
-
-    const req: SousCompteurRequest = {
-      ...this.addCompteurForm.value,
-      maisonId: this.maisonId
-    };
-
+    const req: SousCompteurRequest = { ...this.addCompteurForm.value, maisonId: this.maisonId };
     this.sousCompteurService.creerSousCompteur(req).subscribe({
       next: () => {
         this.toast.success('Additionneuse ajoutée avec succès !');
         this.isSubmitting.set(false);
         this.closeAddCompteurModal();
-        this.loadAvailableCompteurs(); // Recharger les compteurs dispos
+        this.loadAvailableCompteurs();
       },
       error: (err) => {
-        this.toast.error(err?.message || 'Erreur lors de l\'ajout');
+        this.toast.error(err?.error?.message || 'Erreur lors de l\'ajout');
         this.isSubmitting.set(false);
       }
     });
   }
 
+  // ── Détails locataire ──────────────────────────
+  ouvrirDetail(loc: SousCompteurResponse): void {
+    this.selectedLocataire.set(loc);
+    this.isDetailModalOpen.set(true);
+  }
+
+  fermerDetail(): void {
+    this.isDetailModalOpen.set(false);
+  }
+
+  // ── Modifier locataire ─────────────────────────
+  ouvrirEdit(loc: SousCompteurResponse): void {
+    this.selectedLocataire.set(loc);
+    this.editLocataireForm.patchValue({ reference: loc.reference, descriptionLogement: loc.descriptionLogement });
+    this.isEditLocataireModalOpen.set(true);
+  }
+
+  fermerEdit(): void {
+    this.isEditLocataireModalOpen.set(false);
+    this.selectedLocataire.set(null);
+  }
+
+  onSubmitEdit(): void {
+    const loc = this.selectedLocataire();
+    if (this.editLocataireForm.invalid || !loc) return;
+    this.isSubmitting.set(true);
+    this.sousCompteurService.updateSousCompteur(loc.id, this.editLocataireForm.value).subscribe({
+      next: () => {
+        this.toast.success('Additionneuse mise à jour !');
+        this.isSubmitting.set(false);
+        this.fermerEdit();
+        this.loadData();
+      },
+      error: (err) => {
+        this.toast.error(err?.error?.message || 'Erreur lors de la mise à jour');
+        this.isSubmitting.set(false);
+      }
+    });
+  }
+
+  // ── Désactiver locataire ───────────────────────
   deleteLocataire(id: number): void {
     if (confirm('Voulez-vous vraiment désactiver ce locataire ?')) {
       this.locataireService.desactiverLocataire(id).subscribe({
@@ -170,5 +217,9 @@ export class LocatairesComponent implements OnInit {
       });
     }
   }
-}
 
+  formatDate(dateStr?: string): string {
+    if (!dateStr) return '—';
+    return new Date(dateStr).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+}

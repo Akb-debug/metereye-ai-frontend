@@ -54,6 +54,7 @@ export const API_URLS = {
   
   // Sous-compteurs (Additionneuses) & Locataires
   sousCompteurs:        `${BASE}/sous-compteurs`,
+  sousCompteur:         (id: number) => `${BASE}/sous-compteurs/${id}`,
   sousCompteursMaison:  (id: number) => `${BASE}/sous-compteurs/maison/${id}`,
   creerLocataire:       `${BASE}/sous-compteurs/locataires`,
   locatairesMaison:     (id: number) => `${BASE}/sous-compteurs/locataires/maison/${id}`,
@@ -65,6 +66,8 @@ export const API_URLS = {
   repartitionGenerer: `${BASE}/repartition/generer`,
   repartitionMaison: (maisonId: number, mois: number, annee: number) => 
     `${BASE}/repartition/maison/${maisonId}?mois=${mois}&annee=${annee}`,
+  mesFactures: `${BASE}/repartition/mes-factures`,
+  telechargerFacture: (id: number) => `${BASE}/repartition/factures/${id}`,
 };
 
 export const STORAGE_KEYS = {

@@ -26,4 +26,10 @@ export class MaisonService {
       map(r => r.data)
     );
   }
+
+  updateMaison(id: number, req: Partial<MaisonRequest>): Observable<MaisonResponse> {
+    return this.http.put<ApiResponse<MaisonResponse>>(API_URLS.maison(id), req).pipe(
+      map(r => r.data)
+    );
+  }
 }

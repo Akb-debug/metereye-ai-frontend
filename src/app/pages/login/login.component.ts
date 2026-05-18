@@ -1,14 +1,10 @@
-// 🔄 MODIFIÉ — login.component.ts — ajouts : design system, redirection smart par compteur
-
 import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { CompteurService } from '../../services/compteur.service';
-import { ToastService } from '../../services/toast.service';
 import { ToastComponent } from '../../shared/toast/toast.component';
-import { STORAGE_KEYS } from '../../config/app.config.api';
 
 @Component({
   selector: 'app-login',
@@ -24,7 +20,6 @@ export class LoginComponent implements OnInit {
   private compteurService = inject(CompteurService);
   private router          = inject(Router);
   private route           = inject(ActivatedRoute);
-  private toast           = inject(ToastService);
 
   loginForm!: FormGroup;
   isLoading        = false;
@@ -59,25 +54,35 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.loginForm.value).subscribe({
       next: () => this.redirectApresLogin(),
       error: (err) => {
-        this.errorMessage = err.message;
+        const msg: string = err?.message ?? '';
+        // L'intercepteur mappe le 401 vers "Session expirée" mais sur la page
+        // de login, un 401 signifie simplement identifiants incorrects.
+        this.errorMessage = msg.toLowerCase().includes('session') || msg.toLowerCase().includes('expir')
+          ? 'Email ou mot de passe incorrect.'
+          : (msg || 'Email ou mot de passe incorrect.');
         this.isLoading = false;
       }
     });
   }
 
   private redirectApresLogin(): void {
+    const role = this.authService.getUserRole();
+    this.isLoading = false;
+
+    if (role === 'LOCATAIRE') {
+      this.router.navigate(['/dashboard/locataire']);
+      return;
+    }
+
+    if (role === 'PROPRIETAIRE') {
+      this.router.navigate(['/dashboard/proprietaire']);
+      return;
+    }
+
+    // Rôle inconnu : déduire le dashboard depuis le type de compteur
     this.compteurService.getMesCompteurs().subscribe({
       next: (compteurs) => {
-        this.isLoading = false;
-        if (this.authService.getUserRole() === 'PROPRIETAIRE') {
-          this.router.navigate(['/dashboard/proprietaire']);
-        } else if (this.authService.getUserRole() === 'LOCATAIRE') {
-          if (compteurs && compteurs.length > 0) {
-            this.compteurService.sauvegarderCompteurId(compteurs[0].id);
-            this.compteurService.sauvegarderTypeCompteur(compteurs[0].typeCompteur);
-          }
-          this.router.navigate(['/dashboard/locataire']);
-        } else if (!compteurs || compteurs.length === 0) {
+        if (!compteurs || compteurs.length === 0) {
           this.router.navigate(['/onboarding/compteur']);
         } else {
           const c = compteurs[0];
@@ -88,10 +93,7 @@ export class LoginComponent implements OnInit {
           );
         }
       },
-      error: () => {
-        this.isLoading = false;
-        this.router.navigate(['/onboarding/compteur']);
-      }
+      error: () => this.router.navigate(['/onboarding/compteur'])
     });
   }
 }

@@ -91,7 +91,8 @@ export class HistoriqueComponent implements OnInit {
       statut:    ['']
     });
     this.ajoutForm = this.fb.group({
-      value: ['', [Validators.required, Validators.min(0)]]
+      value:   ['', [Validators.required, Validators.min(0)]],
+      comment: ['']
     });
     this.charger();
     this.filterForm.valueChanges.subscribe(() => {
@@ -168,7 +169,11 @@ export class HistoriqueComponent implements OnInit {
     const id = this.compteurService.getCompteurIdSauvegarde();
     if (!id) return;
     this.isSaving = true;
-    this.readingService.createReleveManuel({ meterId: id, value: +this.ajoutForm.value.value, date: new Date().toISOString() }).subscribe({
+    this.readingService.createReleveManuel({
+      meterId: id,
+      value:   +this.ajoutForm.value.value,
+      comment: this.ajoutForm.value.comment || undefined
+    }).subscribe({
       next: () => { this.toast.success('Relevé ajouté !'); this.fermerModal(); this.charger(); this.isSaving = false; },
       error: (e) => { this.errorMessage = e?.error?.message ?? 'Une erreur est survenue.'; this.isSaving = false; }
     });

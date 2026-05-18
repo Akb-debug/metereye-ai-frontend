@@ -33,4 +33,16 @@ export class SousCompteurService {
       map(r => r.data)
     );
   }
+
+  updateSousCompteur(id: number, req: { reference?: string; descriptionLogement?: string }): Observable<SousCompteurResponse> {
+    return this.http.put<ApiResponse<SousCompteurResponse>>(API_URLS.sousCompteur(id), req).pipe(
+      map(r => r.data)
+    );
+  }
+
+  getMonSousCompteur(locataireId: number): Observable<SousCompteurResponse> {
+    return this.http.get<ApiResponse<SousCompteurResponse>>(
+      `${API_URLS.sousCompteurs}/locataires/${locataireId}`
+    ).pipe(map(r => r.data));
+  }
 }
